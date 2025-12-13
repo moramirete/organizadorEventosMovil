@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_change_username"
+        android:title="Cambiar nombre de usuario" />
+    <item
+        android:id="@+id/menu_change_password"
+        android:title="Cambiar contraseña" />
+    <item
+        android:id="@+id/menu_change_email"
+        android:title="Cambiar correo electrónico" />
+    <item
+        android:id="@+id/menu_logout"
+        android:title="Cerrar sesión" />
+</menu>
