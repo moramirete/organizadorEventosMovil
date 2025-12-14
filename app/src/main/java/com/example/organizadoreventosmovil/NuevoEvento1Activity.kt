@@ -1,67 +1,46 @@
+package com.example.organizadoreventosmovil
+
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.example.organizadoreventosmovil.R
+import com.google.android.material.textfield.TextInputEditText
 
 class NuevoEvento1Activity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nuevo_evento1)
 
-        // --- 1. OBTENER REFERENCIAS A TODAS LAS VISTAS ---
-        val btnVolver = findViewById<Button>(R.id.btnVolver)
-        val btnGuardar = findViewById<Button>(R.id.btnGuardarEvento)
+        val nombreEventoEditText = findViewById<TextInputEditText>(R.id.nombreEventoEditText)
+        val fechaEditText = findViewById<TextInputEditText>(R.id.fechaEditText)
+        val organizadorEditText = findViewById<TextInputEditText>(R.id.organizadorEditText)
+        val telefonoEditText = findViewById<TextInputEditText>(R.id.telefonoEditText)
+        val participantesEditText = findViewById<TextInputEditText>(R.id.participantesEditText)
+        val mesasEditText = findViewById<TextInputEditText>(R.id.mesasEditText)
 
-        val etNombreEvento = findViewById<EditText>(R.id.editTextNombreEvento)
-        val etFechaEvento = findViewById<EditText>(R.id.editTextFechaEvento)
-        val etNombreCliente = findViewById<EditText>(R.id.editTextNombreCliente)
-        val etTelefono = findViewById<EditText>(R.id.editTextTelefono)
-        val etParticipantes = findViewById<EditText>(R.id.editTextParticipantes)
-        val etMesas = findViewById<EditText>(R.id.editTextMesas)
+        val btnContinue = findViewById<Button>(R.id.btnContinue)
+        val btnBack = findViewById<Button>(R.id.btnBack)
 
-        // --- 2. CONFIGURAR EL BOTÓN DE VOLVER (CANCELAR) ---
-        btnVolver.setOnClickListener {
-            finish() // Cierra esta actividad y vuelve a la anterior
+        btnContinue.setOnClickListener {
+            val nombreEvento = nombreEventoEditText.text.toString()
+            val fecha = fechaEditText.text.toString()
+            val organizador = organizadorEditText.text.toString()
+            val telefono = telefonoEditText.text.toString()
+            val participantes = participantesEditText.text.toString()
+            val mesas = mesasEditText.text.toString()
+
+            if (nombreEvento.isNotEmpty() && fecha.isNotEmpty() && organizador.isNotEmpty() && telefono.isNotEmpty() && participantes.isNotEmpty() && mesas.isNotEmpty()) {
+                // Por ahora, solo mostramos un mensaje de éxito.
+                Toast.makeText(this, "Datos guardados correctamente", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        // --- 3. CONFIGURAR EL BOTÓN DE GUARDAR ---
-        btnGuardar.setOnClickListener {
-            // Recogemos el texto de cada campo
-            val nombreEvento = etNombreEvento.text.toString()
-            val fechaEvento = etFechaEvento.text.toString()
-            val nombreCliente = etNombreCliente.text.toString()
-            val telefono = etTelefono.text.toString()
-            val participantes = etParticipantes.text.toString()
-            val mesas = etMesas.text.toString()
-
-            // Verificamos que los campos obligatorios no estén vacíos
-            if (nombreEvento.isBlank() || fechaEvento.isBlank()) {
-                // Si faltan datos, mostramos un mensaje de error
-                Toast.makeText(
-                    this,
-                    "El nombre y la fecha del evento son obligatorios",
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                // Si todo está correcto, creamos el mensaje a mostrar
-                val detallesEvento = """
-                    Evento Guardado:
-                    Nombre: $nombreEvento
-                    Fecha: $fechaEvento
-                    Cliente: $nombreCliente
-                    Teléfono: $telefono
-                    Participantes: $participantes
-                    Mesas: $mesas
-                """.trimIndent()
-
-                // Mostramos un Toast con los detalles
-                Toast.makeText(this, detallesEvento, Toast.LENGTH_LONG).show()
-
-                // (Opcional) Después de guardar, podemos cerrar la pantalla
-                // finish()
-            }
+        btnBack.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
         }
     }
 }
