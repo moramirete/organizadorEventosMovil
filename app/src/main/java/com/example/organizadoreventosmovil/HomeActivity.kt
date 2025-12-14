@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.cardview.widget.CardView
 
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,6 +14,7 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         val ivMenu = findViewById<ImageView>(R.id.ivMenu)
+        val btnConsultarEventos = findViewById<CardView>(R.id.btnConsultarEventos)
 
         ivMenu.setOnClickListener { view ->
             val popupMenu = PopupMenu(this, view)
@@ -44,6 +46,11 @@ class HomeActivity : AppCompatActivity() {
             }
 
             popupMenu.show()
+        }
+
+        btnConsultarEventos.setOnClickListener {
+            val intent = Intent(this, VisualizarEvento1Activity::class.java)
+            startActivity(intent)
         }
     }
 }

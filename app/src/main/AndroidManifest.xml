@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OrganizadorEventosMovil">
         <activity
+            android:name=".VisualizarEvento2Activity"
+            android:exported="false" />
+        <activity
+            android:name=".VisualizarEvento1Activity"
+            android:exported="false" />
+        <activity
             android:name=".VerificacionEmailActivity"
             android:exported="false" />
         <activity
