@@ -26,10 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".VisualizarEvento1Activity" android:exported="true" />
-        <activity android:name=".VisualizarEvento2Activity" android:exported="true" />
-
     </application>
 
 </manifest>
