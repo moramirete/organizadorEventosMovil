@@ -11,33 +11,40 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="140dp"
         android:background="#1E73E8"
-        android:paddingTop="40dp"
+        android:paddingTop="50dp"
         android:paddingBottom="24dp"
         android:paddingHorizontal="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/headerTitle"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tus Mesas"
-            android:textColor="@android:color/white"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/headerSubtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Selecciona una mesa"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@+id/headerTitle" />
+            <TextView
+                android:id="@+id/headerTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Tus Mesas"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/headerSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="Selecciona una mesa"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -46,12 +53,12 @@
         android:id="@+id/mesasRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="16dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@+id/headerContainer"
+        android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@+id/footerButtons"
-        tools:listitem="@layout/item_mesa"
-        tools:itemCount="8" />
+        app:layout_constraintTop_toBottomOf="@+id/headerContainer"
+        tools:itemCount="8"
+        tools:listitem="@layout/item_mesa" />
 
     <!-- 3. BOTÓN DE VOLVER -->
     <LinearLayout
@@ -70,10 +77,10 @@
             android:layout_height="56dp"
             android:background="@drawable/button_white_background"
             android:text="Volver Atrás"
-            android:textColor="#202124"
             android:textAllCaps="false"
-            android:textStyle="bold"
-            android:textSize="18sp" />
+            android:textColor="#202124"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

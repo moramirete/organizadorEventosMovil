@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp">
 
@@ -19,6 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nombre de la Mesa"
+            android:textColor="#202124"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -27,6 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Capacidad: 0"
+            android:textColor="#5F6368"
             android:textSize="16sp" />
 
     </LinearLayout>
