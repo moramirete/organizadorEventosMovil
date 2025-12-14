@@ -1,33 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F4F7"
-    tools:context=".NuevoEvento1Activity">
+    android:background="#FFFFFF">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="activity_nuevo_evento1"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/btnVolver"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/btnVolver"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Volver"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        <!-- Título de la pantalla -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear Nuevo Evento"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Campo para el nombre del evento -->
+        <EditText
+            android:id="@+id/editTextNombreEvento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre del Evento"
+            android:inputType="textCapSentences"
+            android:background="@drawable/history_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Campo para la fecha del evento -->
+        <EditText
+            android:id="@+id/editTextFechaEvento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Fecha del Evento (dd/mm/aaaa)"
+            android:inputType="date"
+            android:background="@drawable/history_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Campo para el nombre del cliente -->
+        <EditText
+            android:id="@+id/editTextNombreCliente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre del Cliente"
+            android:inputType="textPersonName"
+            android:background="@drawable/history_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Campo para el teléfono de contacto -->
+        <EditText
+            android:id="@+id/editTextTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Teléfono de Contacto"
+            android:inputType="phone"
+            android:background="@drawable/history_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Contenedor para participantes y mesas -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
+
+            <!-- Campo para el número de participantes -->
+            <EditText
+                android:id="@+id/editTextParticipantes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Nº Partic."
+                android:inputType="number"
+                android:background="@drawable/history_border"
+                android:padding="16dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Campo para el número de mesas -->
+            <EditText
+                android:id="@+id/editTextMesas"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Nº Mesas"
+                android:inputType="number"
+                android:background="@drawable/history_border"
+                android:padding="16dp"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Botón para guardar el evento -->
+        <Button
+            android:id="@+id/btnGuardarEvento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Guardar Evento"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Botón para volver sin guardar (ESTILO MEJORADO) -->
+        <Button
+            android:id="@+id/btnVolver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="?attr/colorPrimary" />
+
+    </LinearLayout>
+</ScrollView>
