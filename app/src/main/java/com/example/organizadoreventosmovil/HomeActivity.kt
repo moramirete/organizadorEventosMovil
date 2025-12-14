@@ -14,6 +14,8 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         val ivMenu = findViewById<ImageView>(R.id.ivMenu)
+        val btnModificarEventos = findViewById<CardView>(R.id.btnModificarEventos)
+        val btnNuevoEvento = findViewById<CardView>(R.id.btnNuevoEvento)
         val btnConsultarEventos = findViewById<CardView>(R.id.btnConsultarEventos)
 
         ivMenu.setOnClickListener { view ->
@@ -46,6 +48,16 @@ class HomeActivity : AppCompatActivity() {
             }
 
             popupMenu.show()
+        }
+
+        btnModificarEventos.setOnClickListener {
+            val intent = Intent(this, ModificarEvento1Activity::class.java)
+            startActivity(intent)
+        }
+
+        btnNuevoEvento.setOnClickListener {
+            val intent = Intent(this, NuevoEvento1Activity::class.java)
+            startActivity(intent)
         }
 
         btnConsultarEventos.setOnClickListener {

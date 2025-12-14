@@ -49,6 +49,7 @@
         app:layout_constraintTop_toBottomOf="@+id/headerBackground">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/btnModificarEventos"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -79,6 +80,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/btnNuevoEvento"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="24dp"
