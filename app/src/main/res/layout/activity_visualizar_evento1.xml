@@ -7,6 +7,7 @@
     android:background="#F2F4F7"
     tools:context=".VisualizarEvento1Activity">
 
+    <!-- 1. CABECERA MODIFICADA -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
@@ -18,65 +19,41 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/headerTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Seleccionar Evento"
+            android:text="Tus Eventos"
             android:textColor="@android:color/white"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/headerSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Selecciona un evento"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
             android:gravity="center"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/headerTitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ScrollView
+    <!-- 2. SCROLLVIEW REEMPLAZADO POR RECYCLERVIEW -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/eventosRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="16dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@+id/headerContainer"
-        app:layout_constraintBottom_toTopOf="@+id/footerButtons">
+        app:layout_constraintBottom_toTopOf="@+id/footerButtons"
+        tools:listitem="@layout/item_evento"
+        tools:itemCount="5" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nombre del Evento, Fecha del Evento"
-                        android:textStyle="bold"
-                        android:textColor="#202124"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:text="[Tabla de Eventos para seleccionar un elemento]"
-                        android:gravity="center"
-                        android:background="#E0E0E0"
-                        android:padding="8dp"/>
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-    </ScrollView>
-
+    <!-- 3. BOTONES INFERIORES MODIFICADOS (SIN BOTÓN CONTINUAR) -->
     <LinearLayout
         android:id="@+id/footerButtons"
         android:layout_width="match_parent"
@@ -88,29 +65,16 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnContinue"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="#1E73E8"
-            android:text="Continuar"
-            android:textColor="@android:color/white"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
-
-        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnBack"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@android:color/white"
+            android:background="@drawable/button_white_background"
             android:text="Volver Atrás"
             android:textColor="#202124"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:elevation="2dp" />
-
+            />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
