@@ -6,6 +6,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.organizadoreventosmovil.Adapters.MesaAdapter
+import com.example.organizadoreventosmovil.Constructores.Mesa
 
 class VisualizarEvento2Activity : AppCompatActivity() {
 
@@ -107,7 +109,7 @@ class VisualizarEvento2Activity : AppCompatActivity() {
                     "Roberto arias",
                     "Marina arias",
                     "Sergio arias",
-                    "Rosa arias",
+                    "Rosa intros",
                     "Diego arias",
                     "Inés arias",
                     "Iván arias",

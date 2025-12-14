@@ -3,8 +3,10 @@ package com.example.organizadoreventosmovil
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -15,6 +17,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val headerBackground = findViewById<View>(R.id.headerBackground)
+        val formContainer = findViewById<ScrollView>(R.id.formScrollView)
+
+        val slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down)
+        val slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up)
+
+        headerBackground.startAnimation(slideDown)
+        formContainer.startAnimation(slideUp)
 
         val tvEmailLabel = findViewById<TextView>(R.id.tvEmailLabel)
         val tvAuthPrompt = findViewById<TextView>(R.id.tvAuthPrompt)

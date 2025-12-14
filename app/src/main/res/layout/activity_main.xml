@@ -31,6 +31,7 @@
         app:layout_constraintTop_toTopOf="@id/headerBackground" />
 
     <ScrollView
+        android:id="@+id/formScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
