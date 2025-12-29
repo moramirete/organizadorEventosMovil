@@ -8,27 +8,37 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.organizadoreventosmovil.Constructores.Mesa
 import com.example.organizadoreventosmovil.R
 
-class MesaAdapter(private val mesas: List<Mesa>, private val onItemClick: (Mesa) -> Unit) :
-    RecyclerView.Adapter<MesaAdapter.MesaViewHolder>() {
+class MesaAdapter(
+    private val mesas: List<Mesa>,
+    private val onMesaClick: (Mesa) -> Unit
+) : RecyclerView.Adapter<MesaAdapter.MesaViewHolder>() {
+
+    class MesaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvNumero: TextView = view.findViewById(R.id.tvNumeroMesa)
+        val tvParticipantes: TextView = view.findViewById(R.id.tvParticipantesMesa)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MesaViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_mesa, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_mesa, parent, false)
         return MesaViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: MesaViewHolder, position: Int) {
         val mesa = mesas[position]
-        holder.nombreMesa.text = mesa.nombre
-        holder.capacidadMesa.text = "Capacidad: ${mesa.capacidad}"
+        holder.tvNumero.text = "Mesa ${mesa.numero}"
+        
+        if (mesa.participantes.isEmpty()) {
+            holder.tvParticipantes.text = "Vacía"
+        } else {
+            val nombres = mesa.participantes.joinToString("\n") { it.nombre }
+            holder.tvParticipantes.text = nombres
+        }
+
         holder.itemView.setOnClickListener {
-            onItemClick(mesa)
+            onMesaClick(mesa)
         }
     }
 
-    override fun getItemCount(): Int = mesas.size
-
-    class MesaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nombreMesa: TextView = itemView.findViewById(R.id.nombreMesaTextView)
-        val capacidadMesa: TextView = itemView.findViewById(R.id.capacidadMesaTextView)
-    }
+    override fun getItemCount() = mesas.size
 }

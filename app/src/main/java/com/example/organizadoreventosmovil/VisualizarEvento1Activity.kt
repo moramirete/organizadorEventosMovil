@@ -7,26 +7,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.organizadoreventosmovil.Adapters.EventoAdapter
-import com.example.organizadoreventosmovil.Constructores.Evento
 
 class VisualizarEvento1Activity : AppCompatActivity() {
+    
+    private lateinit var adapter: EventoAdapter
+    private lateinit var eventosRecyclerView: RecyclerView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_visualizar_evento1)
 
-        val eventosRecyclerView: RecyclerView = findViewById(R.id.eventosRecyclerView)
+        eventosRecyclerView = findViewById(R.id.eventosRecyclerView)
         val btnBack: Button = findViewById(R.id.btnBack)
 
-        val eventos = listOf(
-            Evento("Boda de Ana y Juan", "25/12/2024", "Salón Imperial"),
-            Evento("Cumpleaños de Carlos", "15/01/2025", "Casa del Lago"),
-            Evento("Conferencia de Tecnología", "05/03/2025", "Centro de Convenciones")
-        )
+        // Usamos el repositorio compartido
+        val eventos = EventoRepository.getEventos()
 
-        val adapter = EventoAdapter(eventos) { evento ->
+        adapter = EventoAdapter(eventos) { evento ->
             val intent = Intent(this, VisualizarEvento2Activity::class.java)
-            // Opcional: pasar datos del evento a la siguiente actividad
-            // intent.putExtra("NOMBRE_EVENTO", evento.nombre)
+            // Aquí puedes pasar datos extra si es necesario
             startActivity(intent)
         }
 
@@ -35,6 +34,14 @@ class VisualizarEvento1Activity : AppCompatActivity() {
 
         btnBack.setOnClickListener {
             finish()
+        }
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        // Refrescamos la lista al volver a esta pantalla por si hubo cambios
+        if (::adapter.isInitialized) {
+            adapter.notifyDataSetChanged()
         }
     }
 }

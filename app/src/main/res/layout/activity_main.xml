@@ -172,7 +172,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:background="@drawable/f_boton_oscuro"
-                        android:text="Entrar"
+                        android:text="Iniciar Sesion"
                         android:textColor="@android:color/white"
                         android:textAllCaps="false"
                         android:textStyle="bold"

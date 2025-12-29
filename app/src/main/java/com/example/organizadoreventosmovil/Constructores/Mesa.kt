@@ -1,7 +1,7 @@
 package com.example.organizadoreventosmovil.Constructores
 
 data class Mesa(
-    val nombre: String,
-    val capacidad: Int,
-    val participantes: List<String>
+    val numero: Int,
+    val capacidad: Int = 10, // Capacidad por defecto, puede ser variable
+    val participantes: MutableList<Participante> = mutableListOf()
 )

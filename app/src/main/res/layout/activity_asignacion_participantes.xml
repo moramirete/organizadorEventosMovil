@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F4F7"
+    tools:context=".AsignacionParticipantesActivity">
+
+    <!-- CABECERA -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1E73E8"
+        android:paddingTop="40dp"
+        android:paddingBottom="16dp"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/headerTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Asignación de Mesas"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ACCIONES -->
+    <LinearLayout
+        android:id="@+id/actionsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:weightSum="3"
+        app:layout_constraintTop_toBottomOf="@+id/headerContainer">
+
+        <Button
+            android:id="@+id/btnAsignarAuto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Asignar Auto"
+            android:textSize="12sp"
+            android:backgroundTint="#FF9800"/>
+
+        <Button
+            android:id="@+id/btnQuitarTodos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:text="Vaciar Mesas"
+            android:textSize="12sp"
+            android:backgroundTint="#F44336"/>
+
+        <Button
+            android:id="@+id/btnReiniciar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="Reiniciar"
+            android:textSize="12sp"
+            android:backgroundTint="#607D8B"/>
+    </LinearLayout>
+
+    <!-- AREA DE MESAS (GRID) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMesas"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/actionsLayout"
+        app:layout_constraintBottom_toTopOf="@+id/footerLayout" />
+
+    <!-- BOTONES INFERIORES -->
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnVolver"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Volver"
+            android:backgroundTint="#757575"/>
+
+        <Button
+            android:id="@+id/btnGuardar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Guardar Cambios"
+            android:backgroundTint="#4CAF50"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
