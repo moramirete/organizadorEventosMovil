@@ -22,25 +22,22 @@
             android:id="@+id/headerTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:text="Modificar Eventos"
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:textStyle="bold"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="-6dp" />
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/headerSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:gravity="center"
             android:text="Edita o elimina tus eventos"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/headerTitle"
-            tools:layout_editor_absoluteX="16dp" />
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/headerTitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

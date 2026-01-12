@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">organizadorEventosMovil</string>
+    <string name="app_name">Organizador de Eventos \n Los Super Nenes</string>
+    <string name="modificar">Modificar Eventos</string>
+    <string name="consultar">Consultar Eventos</string>
+    <string name="nuevo">Nuevo Evento</string>
+    <string name="volver">Volver Atras</string>
+    <string name="iniciar_sesion">Iniciar Sesion</string>
 </resources>
