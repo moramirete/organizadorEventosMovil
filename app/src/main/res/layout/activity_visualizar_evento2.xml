@@ -8,15 +8,18 @@
     tools:context=".VisualizarEvento2Activity">
 
     <!-- 1. CABECERA MODIFICADA -->
+
+    <!-- 2. SCROLLVIEW REEMPLAZADO POR RECYCLERVIEW -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
         android:layout_height="140dp"
         android:background="#1E73E8"
+        android:paddingHorizontal="16dp"
         android:paddingTop="50dp"
         android:paddingBottom="24dp"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,7 +51,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 2. SCROLLVIEW REEMPLAZADO POR RECYCLERVIEW -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mesasRecyclerView"
         android:layout_width="match_parent"

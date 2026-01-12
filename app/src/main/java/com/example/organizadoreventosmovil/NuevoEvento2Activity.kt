@@ -30,7 +30,6 @@ class NuevoEvento2Activity : AppCompatActivity() {
         val btnAgregar = findViewById<Button>(R.id.btnAgregarParticipante)
         val rvParticipantes = findViewById<RecyclerView>(R.id.rvParticipantes)
         val btnVolver = findViewById<Button>(R.id.btnVolver)
-        val btnGuardar = findViewById<Button>(R.id.btnGuardar)
         val btnSiguiente = findViewById<Button>(R.id.btnSiguiente)
 
         // Configurar RecyclerView
@@ -65,10 +64,6 @@ class NuevoEvento2Activity : AppCompatActivity() {
         // Botones Inferiores
         btnVolver.setOnClickListener {
             finish()
-        }
-
-        btnGuardar.setOnClickListener {
-            Toast.makeText(this, "Cambios guardados", Toast.LENGTH_SHORT).show()
         }
 
         btnSiguiente.setOnClickListener {

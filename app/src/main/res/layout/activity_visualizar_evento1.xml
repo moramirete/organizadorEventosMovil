@@ -22,11 +22,13 @@
             android:id="@+id/headerTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Tus Eventos"
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:gravity="center" />
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="-7dp" />
 
         <TextView
             android:id="@+id/headerSubtitle"

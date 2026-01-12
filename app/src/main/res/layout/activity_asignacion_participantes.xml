@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="140dp"
         android:background="#1E73E8"
         android:paddingTop="40dp"
         android:paddingBottom="16dp"
@@ -22,11 +22,13 @@
             android:id="@+id/headerTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Asignación de Mesas"
             android:textColor="@android:color/white"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:gravity="center" />
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="16dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- ACCIONES -->
