@@ -23,38 +23,26 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_asignacion_participantes)
 
-        // Obtener datos del Intent
         todosParticipantes = intent.getParcelableArrayListExtra("LISTA_PARTICIPANTES") ?: ArrayList()
-        // Intentamos obtener el número de mesas, si no viene, ponemos 5 por defecto
         val numMesas = intent.getIntExtra("NUMERO_MESAS", 5)
 
-        // Inicializar Mesas
         inicializarMesas(numMesas)
 
         rvMesas = findViewById(R.id.rvMesas)
-        val btnAsignarAuto = findViewById<Button>(R.id.btnAsignarAuto)
         val btnQuitarTodos = findViewById<Button>(R.id.btnQuitarTodos)
         val btnReiniciar = findViewById<Button>(R.id.btnReiniciar)
         val btnVolver = findViewById<Button>(R.id.btnVolver)
         val btnGuardar = findViewById<Button>(R.id.btnGuardar)
 
-        // Configurar RecyclerView con Grid (2 columnas)
         rvMesas.layoutManager = GridLayoutManager(this, 2)
         actualizarAdapter()
 
-        // Botón Asignar Automáticamente
-        btnAsignarAuto.setOnClickListener {
-            asignarAutomaticamente()
-        }
-
-        // Botón Quitar Todos (Vaciar mesas)
         btnQuitarTodos.setOnClickListener {
             mesas.forEach { it.participantes.clear() }
             actualizarAdapter()
             Toast.makeText(this, "Mesas vaciadas", Toast.LENGTH_SHORT).show()
         }
 
-        // Botón Reiniciar (Vaciar y restaurar estado inicial)
         btnReiniciar.setOnClickListener {
             inicializarMesas(numMesas)
             actualizarAdapter()
@@ -83,7 +71,6 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoSeleccionParticipante(mesa: Mesa) {
-        // Filtramos los participantes que YA están asignados a alguna mesa
         val asignados = mesas.flatMap { it.participantes }.toSet()
         val disponibles = todosParticipantes.filter { !asignados.contains(it) }
 
@@ -98,26 +85,28 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
             .setTitle("Agregar a Mesa ${mesa.numero}")
             .setItems(nombres) { _, which ->
                 val seleccionado = disponibles[which]
-                mesa.participantes.add(seleccionado)
-                adapter.notifyDataSetChanged() // Refrescamos la vista
-                Toast.makeText(this, "${seleccionado.nombre} agregado a Mesa ${mesa.numero}", Toast.LENGTH_SHORT).show()
+                if (mesa.participantes.size < mesa.capacidad) {
+                    mesa.participantes.add(seleccionado)
+                    adapter.notifyDataSetChanged()
+                    Toast.makeText(this, "${seleccionado.nombre} agregado a Mesa ${mesa.numero}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "La mesa está llena", Toast.LENGTH_SHORT).show()
+                }
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
+    // La función de asignación automática ya no se usa, pero la dejamos por si se reutiliza en el futuro
     private fun asignarAutomaticamente() {
-        // Limpiamos asignaciones actuales
         mesas.forEach { it.participantes.clear() }
-
-        // Algoritmo simple de reparto (Round Robin)
-        // Se puede mejorar considerando preferencias
         var mesaIndex = 0
         for (participante in todosParticipantes) {
-            mesas[mesaIndex].participantes.add(participante)
-            mesaIndex = (mesaIndex + 1) % mesas.size
+            if (mesas.isNotEmpty()) {
+                mesas[mesaIndex].participantes.add(participante)
+                mesaIndex = (mesaIndex + 1) % mesas.size
+            }
         }
-
         actualizarAdapter()
         Toast.makeText(this, "Asignación automática completada", Toast.LENGTH_SHORT).show()
     }
