@@ -2,6 +2,7 @@ package com.example.organizadoreventosmovil
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
@@ -22,11 +23,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 @Serializable
-data class Usuario(
-    val username: String,
-    val email: String,
-    val password_text: String
-)
+data class UsuarioEmailOnly(val email: String)
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         val etUsername = findViewById<EditText>(R.id.etUsername)
 
         btnAction.setOnClickListener {
-            val identifier = etEmail.text.toString().trim() // Puede ser email o username
+            val identifier = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
             if (identifier.isEmpty() || password.isEmpty()) {
@@ -72,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val confirmPassword = etConfirmPassword.text.toString().trim()
                 val username = etUsername.text.toString().trim()
-                val email = identifier // En registro, el identifier siempre es el email
+                val email = identifier
 
                 if (password != confirmPassword) {
                     Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
@@ -120,7 +117,6 @@ class MainActivity : AppCompatActivity() {
             try {
                 var emailToUse = identifier
 
-                // Si no parece un email (no tiene @), buscamos el email asociado al username en la tabla 'usuarios'
                 if (!identifier.contains("@")) {
                     val resultado = SupabaseClient.client.postgrest["usuarios"]
                         .select(Columns.list("email")) {
@@ -133,12 +129,11 @@ class MainActivity : AppCompatActivity() {
                     if (resultado != null) {
                         emailToUse = resultado.email
                     } else {
-                        Toast.makeText(this@MainActivity, "Nombre de usuario no encontrado", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Usuario no encontrado", Toast.LENGTH_SHORT).show()
                         return@launch
                     }
                 }
 
-                // Ahora que tenemos el email (ya sea el original o el recuperado), iniciamos sesión en Auth
                 SupabaseClient.client.auth.signInWith(Email) {
                     this.email = emailToUse
                     this.password = password
@@ -147,7 +142,9 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this@MainActivity, HomeActivity::class.java))
                 finish()
             } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Error al iniciar sesión: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("SUPABASE_ERROR", "Error de Login: ", e)
+                val msg = if (e.message?.contains("invalid", true) == true) "Credenciales incorrectas" else "Error al iniciar sesión"
+                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -155,7 +152,6 @@ class MainActivity : AppCompatActivity() {
     private fun registerUser(email: String, password: String, username: String) {
         lifecycleScope.launch {
             try {
-                // 1. Registro en Supabase Auth
                 SupabaseClient.client.auth.signUpWith(Email) {
                     this.email = email
                     this.password = password
@@ -164,24 +160,20 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                // 2. Registro en tu tabla personalizada 'usuarios'
-                val nuevoUsuario = Usuario(username, email, password)
-                SupabaseClient.client.postgrest["usuarios"].insert(nuevoUsuario)
-
-                Toast.makeText(this@MainActivity, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "¡Bienvenido! Registro exitoso", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this@MainActivity, HomeActivity::class.java))
                 finish()
             } catch (e: Exception) {
-                if (e.message?.contains("already registered", ignoreCase = true) == true || 
-                    e.message?.contains("duplicate key", ignoreCase = true) == true) {
-                    Toast.makeText(this@MainActivity, "Este usuario o correo ya existe", Toast.LENGTH_LONG).show()
+                Log.e("SUPABASE_ERROR", "Error de Registro: ", e)
+                val msg = if (e.message?.contains("already registered", true) == true) {
+                    "Este correo ya está registrado"
+                } else if (e.message?.contains("duplicate", true) == true) {
+                    "El nombre de usuario ya existe"
                 } else {
-                    Toast.makeText(this@MainActivity, "Error al registrarse: ${e.message}", Toast.LENGTH_LONG).show()
+                    "No se pudo completar el registro"
                 }
+                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
             }
         }
     }
 }
-
-@Serializable
-data class UsuarioEmailOnly(val email: String)
