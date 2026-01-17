@@ -54,12 +54,27 @@
             android:id="@+id/btnReiniciar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:paddingVertical="12dp"
             app:backgroundTint="#1E73E8"
             app:cornerRadius="8dp"
             android:text="Reiniciar Asignaciones"
             android:textAllCaps="false"
             android:textColor="@android:color/white" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAsignarAuto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            app:backgroundTint="#1E73E8"
+            app:cornerRadius="8dp"
+            android:text="Asignar AUTO"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
     </LinearLayout>
 
     <!-- AREA DE MESAS (GRID) -->

@@ -2,114 +2,55 @@ package com.example.organizadoreventosmovil
 
 import android.os.Bundle
 import android.widget.Button
-import androidx.appcompat.app.AlertDialog
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.organizadoreventosmovil.Adapters.MesaAdapter
 import com.example.organizadoreventosmovil.Constructores.Mesa
-import com.example.organizadoreventosmovil.Constructores.Participante
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class VisualizarEvento2Activity : AppCompatActivity() {
+
+    private lateinit var mesasRecyclerView: RecyclerView
+    private lateinit var mesaAdapter: MesaAdapter
+    private var mesas = mutableListOf<Mesa>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_visualizar_evento2)
 
-        val mesasRecyclerView: RecyclerView = findViewById(R.id.mesasRecyclerView)
+        val headerTitle = findViewById<TextView>(R.id.headerTitle)
+        val btnBack = findViewById<Button>(R.id.btnBack)
+        mesasRecyclerView = findViewById(R.id.mesasRecyclerView)
 
-        // Función auxiliar para crear participantes rápidamente
-        fun p(nombres: List<String>): MutableList<Participante> {
-            return nombres.map { Participante(it, "", "") }.toMutableList()
+        // Recibir datos del Intent
+        val nombreEvento = intent.getStringExtra("NOMBRE_EVENTO")
+        val distribucionJson = intent.getStringExtra("DISTRIBUCION_MESAS")
+
+        headerTitle.text = nombreEvento ?: "Detalles del Evento"
+
+        if (distribucionJson != null) {
+            try {
+                // Convertir el JSON de nuevo a una lista de Mesas
+                mesas = Json.decodeFromString<MutableList<Mesa>>(distribucionJson)
+            } catch (e: Exception) {
+                // Manejar error de deserialización si ocurre
+            }
         }
 
-        val mesas = listOf(
-            Mesa(
-                1,
-                8,
-                p(listOf(
-                    "Juan Pérez", "Ana García", "Luis Rodríguez", "María Fernández",
-                    "Carlos Sánchez", "Laura Gómez", "Miguel Martínez", "Sofía López"
-                ))
-            ),
-            Mesa(
-                2,
-                10,
-                p(listOf(
-                    "David Jiménez", "Elena Castillo", "Javier Ruiz", "Isabel Navarro",
-                    "Francisco Vargas", "Raquel Serrano", "Daniel Romero", "Carmen Ortega",
-                    "Pablo Medina", "Natalia Prieto"
-                ))
-            ),
-            Mesa(
-                3,
-                6,
-                p(listOf(
-                    "Andrés Molina", "Beatriz Gil", "Óscar Crespo",
-                    "Teresa Ramos", "Rubén Soto", "Lorena Pascual"
-                ))
-            ),
-            Mesa(
-                4,
-                8,
-                p(listOf(
-                    "Fernando Alonso", "Silvia Reyes", "Ricardo Sanz", "Mónica Santos",
-                    "Adrián Soler", "Verónica Vidal", "César Bravo", "Esther Blasco"
-                ))
-            ),
-            Mesa(
-                5,
-                10,
-                p(listOf(
-                    "Jorge Sáez", "Cristina Vega", "Manuel Rivas", "Nerea Campos",
-                    "Álvaro Ibáñez", "Fátima Marín", "Guillermo Núñez", "Rocío Peña",
-                    "Héctor Parra", "Eva Durán"
-                ))
-            ),
-            Mesa(
-                6,
-                6,
-                p(listOf(
-                    "Ignacio arias", "Lidia Fuentes", "Mario Cano",
-                    "Noelia Aguilar", "Samuel arias", "Pilar arias"
-                ))
-            ),
-            Mesa(
-                7,
-                8,
-                p(listOf(
-                    "Roberto arias", "Marina arias", "Sergio arias", "Rosa intros",
-                    "Diego arias", "Inés arias", "Iván arias", "Nuria arias"
-                ))
-            ),
-            Mesa(
-                8,
-                10,
-                p(listOf(
-                    "Víctor arias", "Raquel arias", "Alberto arias", "Clara arias",
-                    "Félix arias", "Lara arias", "Marcos arias", "Paula arias",
-                    "Santiago arias", "Aitana arias"
-                ))
-            )
-        )
+        setupRecyclerView()
 
-        val adapter = MesaAdapter(mesas) { mesa ->
-            // Convertimos la lista de objetos Participante a un String legible
-            val participantes = mesa.participantes.joinToString("\n") { it.nombre }
-            
-            AlertDialog.Builder(this)
-                .setTitle("Participantes de Mesa ${mesa.numero}")
-                .setMessage(participantes)
-                .setPositiveButton("Aceptar", null)
-                .show()
-        }
-
-        mesasRecyclerView.layoutManager = LinearLayoutManager(this)
-        mesasRecyclerView.adapter = adapter
-
-        val btnBack: Button = findViewById(R.id.btnBack)
         btnBack.setOnClickListener {
             finish()
         }
+    }
+
+    private fun setupRecyclerView() {
+        // El adapter para visualizar no necesita lógica de clics
+        mesaAdapter = MesaAdapter(mesas) { /* No hacer nada al hacer clic */ }
+        mesasRecyclerView.layoutManager = GridLayoutManager(this, 2) // Mostramos en 2 columnas
+        mesasRecyclerView.adapter = mesaAdapter
     }
 }

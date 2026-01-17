@@ -15,13 +15,21 @@ class NuevoEvento2Activity : AppCompatActivity() {
 
     private val participantes = mutableListOf<Participante>()
     private lateinit var adapter: ParticipanteAdapter
+    
+    // Variables para almacenar los datos del evento
+    private var nombreEvento: String? = null
+    private var fechaEvento: String? = null
+    private var lugarEvento: String? = null
     private var numeroMesas = 5 // Valor por defecto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nuevo_evento2)
 
-        // Recibir número de mesas de la actividad anterior
+        // Recibir los datos del evento de la actividad anterior
+        nombreEvento = intent.getStringExtra("NOMBRE_EVENTO")
+        fechaEvento = intent.getStringExtra("FECHA_EVENTO")
+        lugarEvento = intent.getStringExtra("LUGAR_EVENTO")
         numeroMesas = intent.getIntExtra("NUMERO_MESAS", 5)
 
         val etNombre = findViewById<TextInputEditText>(R.id.etNombreParticipante)
@@ -46,12 +54,11 @@ class NuevoEvento2Activity : AppCompatActivity() {
             val prefiere = etPrefiere.text.toString()
             val noPrefiere = etNoPrefiere.text.toString()
 
-            if (nombre.isNotEmpty()) {
+            if (nombre.trim().isNotEmpty()) {
                 val nuevoParticipante = Participante(nombre, prefiere, noPrefiere)
                 participantes.add(nuevoParticipante)
                 adapter.notifyDataSetChanged()
                 
-                // Limpiar campos
                 etNombre.text?.clear()
                 etPrefiere.text?.clear()
                 etNoPrefiere.text?.clear()
@@ -68,10 +75,14 @@ class NuevoEvento2Activity : AppCompatActivity() {
 
         btnSiguiente.setOnClickListener {
             val intent = Intent(this, AsignacionParticipantesActivity::class.java)
-            // Pasar lista de participantes a la siguiente actividad
-            intent.putParcelableArrayListExtra("LISTA_PARTICIPANTES", ArrayList(participantes))
-            // Pasar el número de mesas a la siguiente actividad
+            
+            // Pasar TODOS los datos a la siguiente actividad
+            intent.putExtra("NOMBRE_EVENTO", nombreEvento)
+            intent.putExtra("FECHA_EVENTO", fechaEvento)
+            intent.putExtra("LUGAR_EVENTO", lugarEvento)
             intent.putExtra("NUMERO_MESAS", numeroMesas)
+            intent.putParcelableArrayListExtra("LISTA_PARTICIPANTES", ArrayList(participantes))
+            
             startActivity(intent)
         }
     }

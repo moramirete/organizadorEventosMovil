@@ -30,8 +30,8 @@ class ParticipanteAdapter(
         val participante = participantes[position]
         holder.tvNombre.text = participante.nombre
         
-        val prefiere = if (participante.prefiereA.isNotEmpty()) "Prefiere: ${participante.prefiereA}" else ""
-        val noPrefiere = if (participante.noPrefiereA.isNotEmpty()) "No prefiere: ${participante.noPrefiereA}" else ""
+        val prefiere = if (participante.prefiere.isNotEmpty()) "Prefiere: ${participante.prefiere}" else ""
+        val noPrefiere = if (participante.noPrefiere.isNotEmpty()) "No prefiere: ${participante.noPrefiere}" else ""
         
         holder.tvPreferencias.text = listOf(prefiere, noPrefiere).filter { it.isNotEmpty() }.joinToString(" | ")
 
