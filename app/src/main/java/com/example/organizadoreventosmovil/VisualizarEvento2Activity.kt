@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.organizadoreventosmovil.Adapters.MesaAdapter
+import com.example.organizadoreventosmovil.Constructores.Evento
 import com.example.organizadoreventosmovil.Constructores.Mesa
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -15,42 +16,44 @@ class VisualizarEvento2Activity : AppCompatActivity() {
 
     private lateinit var mesasRecyclerView: RecyclerView
     private lateinit var mesaAdapter: MesaAdapter
-    private var mesas = mutableListOf<Mesa>()
+    private var evento: Evento? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_visualizar_evento2)
 
         val headerTitle = findViewById<TextView>(R.id.headerTitle)
+        val telefonoTextView = findViewById<TextView>(R.id.telefonoTextView)
+        val participantesTextView = findViewById<TextView>(R.id.participantesTextView)
         val btnBack = findViewById<Button>(R.id.btnBack)
         mesasRecyclerView = findViewById(R.id.mesasRecyclerView)
 
-        // Recibir datos del Intent
-        val nombreEvento = intent.getStringExtra("NOMBRE_EVENTO")
-        val distribucionJson = intent.getStringExtra("DISTRIBUCION_MESAS")
+        val eventoJson = intent.getStringExtra("EVENTO_JSON")
 
-        headerTitle.text = nombreEvento ?: "Detalles del Evento"
-
-        if (distribucionJson != null) {
+        if (eventoJson != null) {
             try {
-                // Convertir el JSON de nuevo a una lista de Mesas
-                mesas = Json.decodeFromString<MutableList<Mesa>>(distribucionJson)
+                evento = Json.decodeFromString<Evento>(eventoJson)
             } catch (e: Exception) {
-                // Manejar error de deserialización si ocurre
+                // Manejar error
             }
         }
 
-        setupRecyclerView()
+        evento?.let {
+            headerTitle.text = it.nombre
+            telefonoTextView.text = "Teléfono: ${it.telefono ?: "No especificado"}"
+            participantesTextView.text = "Participantes: ${it.num_participantes?.toString() ?: "No especificado"}"
+            setupRecyclerView(it.distribucion)
+        }
+
 
         btnBack.setOnClickListener {
             finish()
         }
     }
 
-    private fun setupRecyclerView() {
-        // El adapter para visualizar no necesita lógica de clics
-        mesaAdapter = MesaAdapter(mesas) { /* No hacer nada al hacer clic */ }
-        mesasRecyclerView.layoutManager = GridLayoutManager(this, 2) // Mostramos en 2 columnas
+    private fun setupRecyclerView(mesas: List<Mesa>) {
+        mesaAdapter = MesaAdapter(mesas.toMutableList()) { /* No hacer nada al hacer clic */ }
+        mesasRecyclerView.layoutManager = GridLayoutManager(this, 2)
         mesasRecyclerView.adapter = mesaAdapter
     }
 }

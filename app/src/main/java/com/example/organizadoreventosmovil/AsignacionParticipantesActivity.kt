@@ -14,7 +14,6 @@ import com.example.organizadoreventosmovil.Adapters.MesaAdapter
 import com.example.organizadoreventosmovil.Constructores.Evento
 import com.example.organizadoreventosmovil.Constructores.Mesa
 import com.example.organizadoreventosmovil.Constructores.Participante
-// CORRECCIÓN DE IMPORTS:
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
@@ -30,15 +29,24 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
     private var fechaEvento: String = ""
     private var lugarEvento: String = ""
 
+    // Para modo edición
+    private var isEditMode = false
+    private var eventoId: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_asignacion_participantes)
 
+        // Recoger datos básicos del intent
         nombreEvento = intent.getStringExtra("NOMBRE_EVENTO") ?: ""
         fechaEvento = intent.getStringExtra("FECHA_EVENTO") ?: ""
         lugarEvento = intent.getStringExtra("LUGAR_EVENTO") ?: ""
         todosParticipantes = intent.getParcelableArrayListExtra("LISTA_PARTICIPANTES") ?: ArrayList()
         val numMesas = intent.getIntExtra("NUMERO_MESAS", 5)
+
+        // Recoger datos de modo edición
+        isEditMode = intent.getBooleanExtra("IS_EDIT_MODE", false)
+        eventoId = intent.getStringExtra("EVENTO_ID")
 
         inicializarMesas(numMesas)
 
@@ -54,6 +62,10 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnGuardar).setOnClickListener {
             guardarEventoEnNube()
+        }
+
+        findViewById<Button>(R.id.btnVolver).setOnClickListener {
+            finish()
         }
 
         rvMesas.layoutManager = GridLayoutManager(this, 2)
@@ -90,13 +102,28 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                SupabaseClient.client.postgrest["eventos"].insert(eventoParaGuardar)
-                Toast.makeText(this@AsignacionParticipantesActivity, "¡Guardado con éxito!", Toast.LENGTH_LONG).show()
-                startActivity(Intent(this@AsignacionParticipantesActivity, HomeActivity::class.java))
+                if (isEditMode && eventoId != null) {
+                    // MODO EDICIÓN: Actualizar evento existente
+                    SupabaseClient.client.postgrest["eventos"].update(eventoParaGuardar) {
+                        filter {
+                            eq("id", eventoId!!)
+                        }
+                    }
+                    Toast.makeText(this@AsignacionParticipantesActivity, "¡Actualizado con éxito!", Toast.LENGTH_LONG).show()
+                } else {
+                    // MODO NUEVO: Insertar evento nuevo
+                    SupabaseClient.client.postgrest["eventos"].insert(eventoParaGuardar)
+                    Toast.makeText(this@AsignacionParticipantesActivity, "¡Guardado con éxito!", Toast.LENGTH_LONG).show()
+                }
+
+                // Volver a la pantalla de inicio tras guardar/actualizar
+                startActivity(Intent(this@AsignacionParticipantesActivity, HomeActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                })
                 finish()
             } catch (e: Exception) {
-                Log.e("SUPABASE", "Error: ${e.message}")
-                Toast.makeText(this@AsignacionParticipantesActivity, "Error al guardar", Toast.LENGTH_SHORT).show()
+                Log.e("SUPABASE", "Error al guardar/actualizar: ${e.message}")
+                Toast.makeText(this@AsignacionParticipantesActivity, "Error en la operación", Toast.LENGTH_SHORT).show()
             }
         }
     }

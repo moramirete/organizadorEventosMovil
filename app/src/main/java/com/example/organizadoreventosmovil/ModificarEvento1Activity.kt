@@ -13,7 +13,10 @@ import com.example.organizadoreventosmovil.Adapters.EventoModificarAdapter
 import com.example.organizadoreventosmovil.Constructores.Evento
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class ModificarEvento1Activity : AppCompatActivity() {
 
@@ -33,7 +36,8 @@ class ModificarEvento1Activity : AppCompatActivity() {
             eventos,
             onEditClick = { evento ->
                 val intent = Intent(this, NuevoEvento1Activity::class.java)
-                intent.putExtra("EVENTO_ID", evento.id)
+                val eventoJson = Json.encodeToString(evento)
+                intent.putExtra("EVENTO_JSON", eventoJson)
                 intent.putExtra("IS_EDIT_MODE", true)
                 startActivity(intent)
             },
@@ -63,7 +67,7 @@ class ModificarEvento1Activity : AppCompatActivity() {
             try {
                 // Consultamos solo los eventos que pertenecen al usuario logueado
                 val lista = SupabaseClient.client.postgrest["eventos"]
-                    .select {
+                    .select(columns = Columns.ALL) {
                         filter {
                             eq("usuario_id", user.id)
                         }

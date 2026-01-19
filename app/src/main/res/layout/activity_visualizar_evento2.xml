@@ -13,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:background="#1E73E8"
         android:paddingHorizontal="16dp"
         android:paddingTop="50dp"
@@ -45,6 +45,24 @@
                 android:layout_marginTop="4dp"
                 android:gravity="center"
                 android:text="Selecciona una mesa"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/telefonoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/participantesTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
         </LinearLayout>

@@ -6,34 +6,55 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.organizadoreventosmovil.Constructores.Evento
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.serialization.json.Json
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class NuevoEvento1Activity : AppCompatActivity() {
 
-    // Variable técnica para Supabase (YYYY-MM-DD)
     private var fechaIsoParaNube: String = ""
+    private var evento: Evento? = null
+    private var isEditMode = false
+
+    private lateinit var nombreEventoEditText: TextInputEditText
+    private lateinit var fechaEditText: TextInputEditText
+    private lateinit var organizadorEditText: TextInputEditText
+    private lateinit var telefonoEditText: TextInputEditText
+    private lateinit var participantesEditText: TextInputEditText
+    private lateinit var mesasEditText: TextInputEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nuevo_evento1)
 
-        val nombreEventoEditText = findViewById<TextInputEditText>(R.id.nombreEventoEditText)
-        val fechaEditText = findViewById<TextInputEditText>(R.id.fechaEditText)
-        val organizadorEditText = findViewById<TextInputEditText>(R.id.organizadorEditText)
-        val mesasEditText = findViewById<TextInputEditText>(R.id.mesasEditText)
+        nombreEventoEditText = findViewById(R.id.nombreEventoEditText)
+        fechaEditText = findViewById(R.id.fechaEditText)
+        organizadorEditText = findViewById(R.id.organizadorEditText)
+        telefonoEditText = findViewById(R.id.telefonoEditText)
+        participantesEditText = findViewById(R.id.participantesEditText)
+        mesasEditText = findViewById(R.id.mesasEditText)
 
         val btnContinue = findViewById<Button>(R.id.btnContinue)
         val btnBack = findViewById<Button>(R.id.btnBack)
 
-        // Configuración DatePicker
+        isEditMode = intent.getBooleanExtra("IS_EDIT_MODE", false)
+        if (isEditMode) {
+            val eventoJson = intent.getStringExtra("EVENTO_JSON")
+            if (eventoJson != null) {
+                evento = Json.decodeFromString<Evento>(eventoJson)
+                cargarDatosDelEvento(evento!!)
+            }
+        }
+
         fechaEditText.isFocusable = false
         fechaEditText.setOnClickListener {
             val calendario = Calendar.getInstance()
             DatePickerDialog(this, { _, year, month, day ->
                 val fechaVisible = String.format("%02d/%02d/%04d", day, month + 1, year)
                 fechaEditText.setText(fechaVisible)
-                // Guardamos el formato ISO para evitar errores de base de datos
                 fechaIsoParaNube = String.format("%04d-%02d-%02d", year, month + 1, day)
             }, calendario.get(Calendar.YEAR), calendario.get(Calendar.MONTH), calendario.get(Calendar.DAY_OF_MONTH)).show()
         }
@@ -41,15 +62,16 @@ class NuevoEvento1Activity : AppCompatActivity() {
         btnContinue.setOnClickListener {
             val nombre = nombreEventoEditText.text.toString().trim()
             val organizador = organizadorEditText.text.toString().trim()
+            val telefono = telefonoEditText.text.toString().trim()
+            val participantesStr = participantesEditText.text.toString().trim()
             val mesasStr = mesasEditText.text.toString().trim()
 
-            // VALIDACIÓN POR FASES (Confirmación antes de avanzar)
             if (nombre.isEmpty()) {
                 nombreEventoEditText.error = "El nombre es obligatorio"
                 return@setOnClickListener
             }
 
-            if (fechaIsoParaNube.isEmpty()) {
+            if (fechaIsoParaNube.isEmpty() && !isEditMode) {
                 Toast.makeText(this, "Selecciona una fecha", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -60,17 +82,53 @@ class NuevoEvento1Activity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // SI TODO ESTÁ BIEN: Confirmamos visualmente y pasamos a la fase 2
+            val numParticipantes = participantesStr.toIntOrNull()
+            if (numParticipantes == null || numParticipantes <= 0) {
+                participantesEditText.error = "Introduce un número válido de participantes"
+                return@setOnClickListener
+            }
+
             Toast.makeText(this, "✅ Datos básicos correctos", Toast.LENGTH_SHORT).show()
 
             val intent = Intent(this, NuevoEvento2Activity::class.java)
             intent.putExtra("NOMBRE_EVENTO", nombre)
-            intent.putExtra("FECHA_EVENTO", fechaIsoParaNube)
+            intent.putExtra("FECHA_EVENTO", if (fechaIsoParaNube.isNotEmpty()) fechaIsoParaNube else evento?.fecha)
             intent.putExtra("LUGAR_EVENTO", organizador)
+            intent.putExtra("TELEFONO_EVENTO", telefono)
+            intent.putExtra("NUM_PARTICIPANTES", numParticipantes)
             intent.putExtra("NUMERO_MESAS", numMesas)
+             if (isEditMode) {
+                intent.putExtra("EVENTO_ID", evento?.id)
+                intent.putExtra("IS_EDIT_MODE", true)
+            }
             startActivity(intent)
         }
 
         btnBack.setOnClickListener { finish() }
+    }
+
+    private fun cargarDatosDelEvento(evento: Evento) {
+        nombreEventoEditText.setText(evento.nombre)
+        organizadorEditText.setText(evento.ubicacion ?: "")
+        telefonoEditText.setText(evento.telefono ?: "")
+        participantesEditText.setText(evento.num_participantes?.toString() ?: "")
+
+        if (!evento.fecha.isNullOrEmpty()) {
+            val dateStr = evento.fecha
+            fechaIsoParaNube = dateStr // Guardamos la fecha original
+
+            val parser = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+            try {
+                val parsedDate = parser.parse(dateStr)
+                fechaEditText.setText(parsedDate?.let { formatter.format(it) } ?: dateStr)
+            } catch (e: Exception) {
+                fechaEditText.setText(dateStr) // Fallback a mostrar la fecha tal cual
+            }
+        } else {
+            fechaEditText.setText("")
+        }
+
+        mesasEditText.setText(evento.distribucion.size.toString())
     }
 }

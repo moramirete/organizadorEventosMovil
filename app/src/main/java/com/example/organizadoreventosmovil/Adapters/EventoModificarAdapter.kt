@@ -34,8 +34,7 @@ class EventoModificarAdapter(
         val evento = eventos[position]
         holder.nombre.text = evento.nombre
         holder.fecha.text = "Fecha: ${evento.fecha ?: ""}"
-        // Usamos .ubicacion porque es el nombre en tu clase Evento
-        holder.lugar.text = "Lugar: ${evento.ubicacion ?: ""}"
+        holder.lugar.text = "Nombre del Organizador: ${evento.ubicacion ?: ""}"
 
         holder.btnEditar.setOnClickListener { onEditClick(evento) }
         holder.btnEliminar.setOnClickListener { onDeleteClick(evento) }

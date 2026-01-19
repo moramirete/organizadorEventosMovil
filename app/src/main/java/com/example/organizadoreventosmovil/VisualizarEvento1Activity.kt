@@ -42,9 +42,8 @@ class VisualizarEvento1Activity : AppCompatActivity() {
     private fun setupRecyclerView() {
         eventoAdapter = EventoAdapter(eventos) { evento ->
             val intent = Intent(this, VisualizarEvento2Activity::class.java)
-            val distribucionJson = Json.encodeToString(evento.distribucion)
-            intent.putExtra("NOMBRE_EVENTO", evento.nombre)
-            intent.putExtra("DISTRIBUCION_MESAS", distribucionJson)
+            val eventoJson = Json.encodeToString(evento)
+            intent.putExtra("EVENTO_JSON", eventoJson)
             startActivity(intent)
         }
         eventosRecyclerView.layoutManager = LinearLayoutManager(this)
