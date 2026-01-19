@@ -2,19 +2,23 @@ package com.example.organizadoreventosmovil
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.organizadoreventosmovil.Adapters.EventoModificarAdapter
 import com.example.organizadoreventosmovil.Constructores.Evento
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.launch
 
 class ModificarEvento1Activity : AppCompatActivity() {
 
     private lateinit var adapter: EventoModificarAdapter
     private lateinit var eventosRecyclerView: RecyclerView
-    // Mantenemos la lista como un campo de la clase para poder actualizarla
     private var eventos = mutableListOf<Evento>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,25 +28,17 @@ class ModificarEvento1Activity : AppCompatActivity() {
         eventosRecyclerView = findViewById(R.id.eventosRecyclerView)
         val btnVolver = findViewById<Button>(R.id.btnVolver)
 
-        // Pasamos la lista mutable al adaptador. Se llenará en onResume.
+        // Configuración del Adaptador con lógica de Nube
         adapter = EventoModificarAdapter(
             eventos,
             onEditClick = { evento ->
                 val intent = Intent(this, NuevoEvento1Activity::class.java)
-                // Pasamos el ID para que la pantalla de edición sepa qué evento modificar
                 intent.putExtra("EVENTO_ID", evento.id)
                 intent.putExtra("IS_EDIT_MODE", true)
                 startActivity(intent)
             },
             onDeleteClick = { evento ->
-                // 1. Eliminar del repositorio usando el ID
-                evento.id?.let { id ->
-                    EventoRepository.eliminarEvento(id)
-                    Toast.makeText(this, "Evento '${evento.nombre}' eliminado", Toast.LENGTH_SHORT).show()
-                }
-
-                // 2. Refrescar la lista en la pantalla para que el cambio sea visible
-                refreshEventList()
+                eliminarEventoDeNube(evento)
             }
         )
 
@@ -56,22 +52,58 @@ class ModificarEvento1Activity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refrescamos la lista cada vez que la pantalla se vuelve visible
-        // para asegurar que los datos siempre estén actualizados.
-        refreshEventList()
+        cargarEventosDesdeNube()
     }
 
-    private fun refreshEventList() {
-        // 1. Obtenemos la lista actualizada del repositorio
-        val updatedEventos = EventoRepository.getEventos()
+    private fun cargarEventosDesdeNube() {
+        val user = SupabaseClient.client.auth.currentUserOrNull()
+        if (user == null) return
 
-        // 2. Limpiamos la lista actual y añadimos los nuevos datos
-        eventos.clear()
-        eventos.addAll(updatedEventos)
+        lifecycleScope.launch {
+            try {
+                // Consultamos solo los eventos que pertenecen al usuario logueado
+                val lista = SupabaseClient.client.postgrest["eventos"]
+                    .select {
+                        filter {
+                            eq("usuario_id", user.id)
+                        }
+                    }
+                    .decodeList<Evento>()
 
-        // 3. Notificamos al adaptador que el conjunto de datos ha cambiado
-        if (::adapter.isInitialized) {
-            adapter.notifyDataSetChanged()
+                eventos.clear()
+                eventos.addAll(lista)
+                adapter.notifyDataSetChanged()
+            } catch (e: Exception) {
+                Log.e("SUPABASE", "Error al cargar: ${e.message}")
+                Toast.makeText(this@ModificarEvento1Activity, "Error al sincronizar datos", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun eliminarEventoDeNube(evento: Evento) {
+        val idEvento = evento.id ?: return
+
+        lifecycleScope.launch {
+            try {
+                // Eliminamos de la tabla "eventos" donde coincida el ID
+                SupabaseClient.client.postgrest["eventos"].delete {
+                    filter {
+                        eq("id", idEvento)
+                    }
+                }
+
+                Toast.makeText(this@ModificarEvento1Activity, "Evento '${evento.nombre}' eliminado", Toast.LENGTH_SHORT).show()
+
+                // Refrescamos la lista localmente para no tener que volver a descargar todo
+                val posicion = eventos.indexOf(evento)
+                if (posicion != -1) {
+                    eventos.removeAt(posicion)
+                    adapter.notifyItemRemoved(posicion)
+                }
+            } catch (e: Exception) {
+                Log.e("SUPABASE", "Error al eliminar: ${e.message}")
+                Toast.makeText(this@ModificarEvento1Activity, "No se pudo eliminar el evento", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

@@ -4,9 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Evento(
-    val id: Long? = null, // ID único de la base de datos (autogenerado)
+    val id: String? = null,
+    val usuario_id: String? = null,
     val nombre: String,
-    val fecha: String,
-    val lugar: String,
+    val descripcion: String? = null,
+    val fecha: String? = null,
+    val ubicacion: String? = null,
     val distribucion: List<Mesa> = emptyList()
 )

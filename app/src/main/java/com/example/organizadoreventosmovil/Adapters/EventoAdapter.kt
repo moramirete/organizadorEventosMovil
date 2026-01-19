@@ -19,8 +19,10 @@ class EventoAdapter(private val eventos: List<Evento>, private val onItemClick: 
     override fun onBindViewHolder(holder: EventoViewHolder, position: Int) {
         val evento = eventos[position]
         holder.nombreEvento.text = evento.nombre
-        holder.fechaEvento.text = "Fecha: ${evento.fecha}"
-        holder.lugarEvento.text = "Lugar: ${evento.lugar}"
+        holder.fechaEvento.text = "Fecha: ${evento.fecha ?: ""}"
+        // Usamos .ubicacion porque es el nombre en tu clase Evento
+        holder.lugarEvento.text = "Lugar: ${evento.ubicacion ?: ""}"
+
         holder.itemView.setOnClickListener {
             onItemClick(evento)
         }
@@ -29,6 +31,7 @@ class EventoAdapter(private val eventos: List<Evento>, private val onItemClick: 
     override fun getItemCount(): Int = eventos.size
 
     class EventoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // IDs corregidos según tu item_evento.xml
         val nombreEvento: TextView = itemView.findViewById(R.id.nombreEventoTextView)
         val fechaEvento: TextView = itemView.findViewById(R.id.fechaEventoTextView)
         val lugarEvento: TextView = itemView.findViewById(R.id.lugarEventoTextView)

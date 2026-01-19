@@ -16,6 +16,7 @@ class EventoModificarAdapter(
 ) : RecyclerView.Adapter<EventoModificarAdapter.EventoViewHolder>() {
 
     class EventoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        // IDs corregidos según tu item_evento_modificar.xml
         val nombre: TextView = view.findViewById(R.id.nombreEventoTextView)
         val fecha: TextView = view.findViewById(R.id.fechaEventoTextView)
         val lugar: TextView = view.findViewById(R.id.lugarEventoTextView)
@@ -32,8 +33,9 @@ class EventoModificarAdapter(
     override fun onBindViewHolder(holder: EventoViewHolder, position: Int) {
         val evento = eventos[position]
         holder.nombre.text = evento.nombre
-        holder.fecha.text = "Fecha: ${evento.fecha}"
-        holder.lugar.text = "Lugar: ${evento.lugar}"
+        holder.fecha.text = "Fecha: ${evento.fecha ?: ""}"
+        // Usamos .ubicacion porque es el nombre en tu clase Evento
+        holder.lugar.text = "Lugar: ${evento.ubicacion ?: ""}"
 
         holder.btnEditar.setOnClickListener { onEditClick(evento) }
         holder.btnEliminar.setOnClickListener { onDeleteClick(evento) }
