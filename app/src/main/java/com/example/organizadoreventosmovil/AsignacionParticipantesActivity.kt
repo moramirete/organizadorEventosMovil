@@ -1,8 +1,11 @@
 package com.example.organizadoreventosmovil
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -14,6 +17,7 @@ import com.example.organizadoreventosmovil.Adapters.MesaAdapter
 import com.example.organizadoreventosmovil.Constructores.Evento
 import com.example.organizadoreventosmovil.Constructores.Mesa
 import com.example.organizadoreventosmovil.Constructores.Participante
+import com.google.android.material.button.MaterialButton
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
@@ -23,6 +27,7 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
 
     private lateinit var rvMesas: RecyclerView
     private lateinit var adapter: MesaAdapter
+    private lateinit var btnVerConflictos: MaterialButton
     private val mesas = mutableListOf<Mesa>()
     private var todosParticipantes = ArrayList<Participante>()
 
@@ -32,7 +37,6 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
     private var telefonoEvento: String? = null
     private var numParticipantesTotal = 0
 
-    // Para modo edición
     private var isEditMode = false
     private var eventoId: String? = null
 
@@ -40,7 +44,6 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_asignacion_participantes)
 
-        // Recoger datos básicos del intent
         nombreEvento = intent.getStringExtra("NOMBRE_EVENTO") ?: ""
         fechaEvento = intent.getStringExtra("FECHA_EVENTO") ?: ""
         lugarEvento = intent.getStringExtra("LUGAR_EVENTO") ?: ""
@@ -49,7 +52,6 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
         val numMesas = intent.getIntExtra("NUMERO_MESAS", 5)
         numParticipantesTotal = intent.getIntExtra("NUM_PARTICIPANTES", 0)
 
-        // Recoger datos de modo edición
         isEditMode = intent.getBooleanExtra("IS_EDIT_MODE", false)
         eventoId = intent.getStringExtra("EVENTO_ID")
         val eventoJson = intent.getStringExtra("EVENTO_JSON")
@@ -59,136 +61,196 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
                 val eventoOriginal = Json.decodeFromString<Evento>(eventoJson)
                 mesas.clear()
                 mesas.addAll(eventoOriginal.distribucion)
-                // Si el usuario cambió el número de mesas en la pantalla 1, ajustamos
-                if (mesas.size != numMesas) {
-                    ajustarCantidadDeMesas(numMesas)
-                }
-            } catch (e: Exception) {
-                Log.e("EDIT_MODE", "Error al decodificar distribución original: ${e.message}")
-                inicializarMesas(numMesas)
-            }
+                if (mesas.size != numMesas) ajustarCantidadDeMesas(numMesas)
+                else recalcularCapacidades()
+            } catch (e: Exception) { inicializarMesas(numMesas) }
         } else {
             inicializarMesas(numMesas)
         }
 
         rvMesas = findViewById(R.id.rvMesas)
+        btnVerConflictos = findViewById(R.id.btnVerConflictos)
+        btnVerConflictos.setOnClickListener { mostrarDialogoConflictos() }
+
         findViewById<Button>(R.id.btnQuitarTodos).setOnClickListener {
             mesas.forEach { it.participantes.clear() }
-            actualizarAdapter()
+            actualizarUI()
         }
 
-        findViewById<Button>(R.id.btnAsignarAuto).setOnClickListener {
-            asignarAutomaticamente()
-        }
+        findViewById<Button>(R.id.btnAsignarAuto).setOnClickListener { asignarAlgoritmoOptimo() }
 
         findViewById<Button>(R.id.btnGuardar).setOnClickListener {
-            guardarEventoEnNube()
+            if (detectarConflictosGraves()) {
+                AlertDialog.Builder(this)
+                    .setTitle("Conflictos Críticos")
+                    .setMessage("Hay personas que no se llevan bien sentadas juntas. ¿Guardar de todas formas?")
+                    .setPositiveButton("Guardar") { _, _ -> guardarEventoEnNube() }
+                    .setNegativeButton("Corregir", null)
+                    .show()
+            } else {
+                guardarEventoEnNube()
+            }
         }
 
-        findViewById<Button>(R.id.btnVolver).setOnClickListener {
-            finish()
-        }
-
+        findViewById<Button>(R.id.btnVolver).setOnClickListener { finish() }
         rvMesas.layoutManager = GridLayoutManager(this, 2)
-        actualizarAdapter()
+        actualizarUI()
+    }
+
+    private fun inicializarMesas(cantidad: Int) {
+        mesas.clear()
+        if (cantidad <= 0) return
+        val totalReal = todosParticipantes.size
+        val baseCapacidad = totalReal / cantidad
+        val resto = totalReal % cantidad
+        for (i in 1..cantidad) {
+            val capacidadMesa = if (i <= resto) baseCapacidad + 1 else baseCapacidad
+            mesas.add(Mesa(numero = i, capacidad = capacidadMesa))
+        }
+    }
+
+    private fun recalcularCapacidades() {
+        if (mesas.isEmpty()) return
+        val totalReal = todosParticipantes.size
+        val baseCapacidad = totalReal / mesas.size
+        val resto = totalReal % mesas.size
+        for (i in mesas.indices) {
+            mesas[i].capacidad = if (i < resto) baseCapacidad + 1 else baseCapacidad
+        }
     }
 
     private fun ajustarCantidadDeMesas(nuevaCantidad: Int) {
+        if (nuevaCantidad <= 0) return
         if (mesas.size < nuevaCantidad) {
-            // Añadir mesas nuevas
-            for (i in (mesas.size + 1)..nuevaCantidad) {
-                mesas.add(Mesa(numero = i))
-            }
+            for (i in (mesas.size + 1)..nuevaCantidad) mesas.add(Mesa(numero = i))
         } else if (mesas.size > nuevaCantidad) {
-            // Quitar mesas sobrantes
-            while (mesas.size > nuevaCantidad) {
-                mesas.removeAt(mesas.size - 1)
-            }
+            while (mesas.size > nuevaCantidad) mesas.removeAt(mesas.size - 1)
         }
+        recalcularCapacidades()
     }
 
-    private fun asignarAutomaticamente() {
+    private fun asignarAlgoritmoOptimo() {
         mesas.forEach { it.participantes.clear() }
-        val participantesMezclados = todosParticipantes.shuffled()
-        var mesaActual = 0
-        for (participante in participantesMezclados) {
-            if (mesas[mesaActual].participantes.size < mesas[mesaActual].capacidad) {
-                mesas[mesaActual].participantes.add(participante)
-            }
-            mesaActual = (mesaActual + 1) % mesas.size
+        val prioritarios = todosParticipantes.sortedByDescending { 
+            (if (it.prefiere.isNotEmpty()) 2 else 0) + (if (it.noPrefiere.isNotEmpty()) 3 else 0)
         }
-        actualizarAdapter()
+        for (participante in prioritarios) {
+            var mejorMesa: Mesa? = null
+            var mejorPuntuacion = -999999
+            for (mesa in mesas) {
+                if (mesa.participantes.size < mesa.capacidad) {
+                    val score = calcularPuntuacionDeMesa(participante, mesa)
+                    if (score > mejorPuntuacion) {
+                        mejorPuntuacion = score
+                        mejorMesa = mesa
+                    }
+                }
+            }
+            mejorMesa?.participantes?.add(participante)
+        }
+        actualizarUI()
+        Toast.makeText(this, "Asignación inteligente completada", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun calcularPuntuacionDeMesa(p: Participante, mesa: Mesa): Int {
+        var score = -(mesa.participantes.size * 5)
+        for (otro in mesa.participantes) {
+            if (p.noPrefiere.equals(otro.nombre, true) || otro.noPrefiere.equals(p.nombre, true)) score -= 1000
+            if (p.prefiere.equals(otro.nombre, true) || otro.prefiere.equals(p.nombre, true)) score += 100
+        }
+        return score
+    }
+
+    private fun detectarConflictosGraves() = mesas.any { mesa ->
+        mesa.participantes.any { p -> mesa.participantes.any { otro -> p.noPrefiere.equals(otro.nombre, true) } }
+    }
+
+    private fun obtenerListaConflictos(): List<String> {
+        val lista = mutableListOf<String>()
+        for (mesa in mesas) {
+            for (p in mesa.participantes) {
+                mesa.participantes.find { it.nombre.equals(p.noPrefiere, true) }?.let {
+                    lista.add("❌ Mesa ${mesa.numero}: ${p.nombre} y ${it.nombre} se llevan mal.")
+                }
+                if (p.prefiere.isNotEmpty()) {
+                    if (!mesa.participantes.any { it.nombre.equals(p.prefiere, true) } && todosParticipantes.any { it.nombre.equals(p.prefiere, true) }) {
+                        lista.add("⚠️ ${p.nombre} no está sentado con ${p.prefiere}.")
+                    }
+                }
+            }
+        }
+        return lista.distinct()
+    }
+
+    private fun mostrarDialogoConflictos() {
+        val errores = obtenerListaConflictos()
+        AlertDialog.Builder(this)
+            .setTitle("Estado de la Asignación")
+            .setMessage(if (errores.isEmpty()) "✅ ¡Perfecto! Se cumplen todas las condiciones." else errores.joinToString("\n"))
+            .setPositiveButton("Entendido", null).show()
+    }
+
+    private fun actualizarUI() {
+        adapter = MesaAdapter(mesas) { mostrarDialogoSeleccionParticipante(it) }
+        rvMesas.adapter = adapter
+        val conflictos = obtenerListaConflictos()
+        btnVerConflictos.visibility = if (conflictos.isNotEmpty()) View.VISIBLE else View.GONE
+        if (conflictos.isNotEmpty()) btnVerConflictos.iconTint = ColorStateList.valueOf(if (detectarConflictosGraves()) Color.RED else Color.parseColor("#FFA500"))
     }
 
     private fun guardarEventoEnNube() {
         val user = SupabaseClient.client.auth.currentUserOrNull()
         if (user == null) {
-            Toast.makeText(this, "Sesión no válida", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Debe iniciar sesión para guardar", Toast.LENGTH_LONG).show()
             return
         }
 
+        // Si el eventoId está vacío, lo tratamos como null para que Supabase genere uno nuevo
+        val cleanEventoId = if (eventoId.isNullOrEmpty()) null else eventoId
+
         val eventoParaGuardar = Evento(
-            id = eventoId,
+            id = cleanEventoId,
             usuario_id = user.id,
             nombre = nombreEvento,
             fecha = fechaEvento,
             ubicacion = lugarEvento,
             telefono = telefonoEvento?.toLongOrNull(),
-            num_participantes = numParticipantesTotal, // Guardamos el número de participantes
+            num_participantes = numParticipantesTotal,
             distribucion = mesas
         )
 
         lifecycleScope.launch {
             try {
-                if (isEditMode && eventoId != null) {
-                    // MODO EDICIÓN: Actualizar evento existente
+                if (isEditMode && cleanEventoId != null) {
                     SupabaseClient.client.postgrest["eventos"].update(eventoParaGuardar) {
-                        filter {
-                            eq("id", eventoId!!)
-                        }
+                        filter { eq("id", cleanEventoId) }
                     }
-                    Toast.makeText(this@AsignacionParticipantesActivity, "¡Actualizado con éxito!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@AsignacionParticipantesActivity, "Evento actualizado", Toast.LENGTH_SHORT).show()
                 } else {
-                    // MODO NUEVO: Insertar evento nuevo
                     SupabaseClient.client.postgrest["eventos"].insert(eventoParaGuardar)
-                    Toast.makeText(this@AsignacionParticipantesActivity, "¡Guardado con éxito!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@AsignacionParticipantesActivity, "Evento guardado", Toast.LENGTH_SHORT).show()
                 }
-
-                // Volver a la pantalla de inicio tras guardar/actualizar
                 startActivity(Intent(this@AsignacionParticipantesActivity, HomeActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                 })
                 finish()
             } catch (e: Exception) {
-                Log.e("SUPABASE", "Error al guardar/actualizar: ${e.message}")
-                Toast.makeText(this@AsignacionParticipantesActivity, "Error en la operación", Toast.LENGTH_SHORT).show()
+                Log.e("SUPABASE_ERROR", "Error al guardar: ${e.message}", e)
+                Toast.makeText(this@AsignacionParticipantesActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
-    }
-
-    private fun inicializarMesas(cantidad: Int) {
-        mesas.clear()
-        for (i in 1..cantidad) mesas.add(Mesa(numero = i))
-    }
-
-    private fun actualizarAdapter() {
-        adapter = MesaAdapter(mesas) { mostrarDialogoSeleccionParticipante(it) }
-        rvMesas.adapter = adapter
     }
 
     private fun mostrarDialogoSeleccionParticipante(mesa: Mesa) {
         val asignados = mesas.flatMap { it.participantes }.toSet()
         val disponibles = todosParticipantes.filter { !asignados.contains(it) }
         val nombres = disponibles.map { it.nombre }.toTypedArray()
-
         if (nombres.isEmpty()) return
-
-        AlertDialog.Builder(this)
-            .setTitle("Asignar a Mesa ${mesa.numero}")
-            .setItems(nombres) { _, which ->
+        AlertDialog.Builder(this).setTitle("Mesa ${mesa.numero}").setItems(nombres) { _, which ->
+            if (mesa.participantes.size < mesa.capacidad) {
                 mesa.participantes.add(disponibles[which])
-                adapter.notifyDataSetChanged()
-            }
-            .show()
+                actualizarUI()
+            } else Toast.makeText(this, "Mesa llena", Toast.LENGTH_SHORT).show()
+        }.show()
     }
 }

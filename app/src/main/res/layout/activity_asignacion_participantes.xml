@@ -7,7 +7,7 @@
     android:background="#F2F4F7"
     tools:context=".AsignacionParticipantesActivity">
 
-    <!-- CABECERA UNIFORME -->
+    <!-- CABECERA -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
@@ -18,18 +18,34 @@
 
         <TextView
             android:id="@+id/headerTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:text="Asignación de Mesas"
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- BOTÓN DE CONFLICTOS -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerConflictos"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:icon="@android:drawable/ic_dialog_info"
+            app:iconTint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- ACCIONES EN VERTICAL -->
+    <!-- ACCIONES -->
     <LinearLayout
         android:id="@+id/actionsLayout"
         android:layout_width="match_parent"
@@ -43,51 +59,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:paddingVertical="12dp"
             app:backgroundTint="#1E73E8"
-            app:cornerRadius="8dp"
-            android:text="Vaciar Todas las Mesas"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnReiniciar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:paddingVertical="12dp"
-            app:backgroundTint="#1E73E8"
-            app:cornerRadius="8dp"
-            android:text="Reiniciar Asignaciones"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white" />
+            android:text="Vaciar Mesas"
+            android:textAllCaps="false" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAsignarAuto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="12dp"
             app:backgroundTint="#1E73E8"
-            app:cornerRadius="8dp"
-            android:text="Asignar AUTO"
+            android:text="Asignación Inteligente (Óptima)"
             android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
             android:textStyle="bold" />
-
     </LinearLayout>
 
-    <!-- AREA DE MESAS (GRID) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMesas"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:clipToPadding="false"
         android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@+id/footerLayout"
         app:layout_constraintTop_toBottomOf="@+id/actionsLayout" />
 
-    <!-- BOTONES INFERIORES EN VERTICAL -->
+    <!-- BOTONES INFERIORES -->
     <LinearLayout
         android:id="@+id/footerLayout"
         android:layout_width="match_parent"
@@ -100,14 +94,9 @@
             android:id="@+id/btnGuardar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:paddingVertical="14dp"
+            android:layout_marginBottom="8dp"
             app:backgroundTint="#1E73E8"
-            app:cornerRadius="8dp"
-            android:text="Guardar Cambios"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:text="Guardar Evento"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -115,11 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@drawable/button_white_bordered"
-            android:text="Volver"
-            android:textAllCaps="false"
-            android:textColor="#202124"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:text="Volver" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
