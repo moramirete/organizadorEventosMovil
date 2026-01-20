@@ -23,8 +23,7 @@ class VisualizarEvento2Activity : AppCompatActivity() {
         setContentView(R.layout.activity_visualizar_evento2)
 
         val headerTitle = findViewById<TextView>(R.id.headerTitle)
-        val telefonoTextView = findViewById<TextView>(R.id.telefonoTextView)
-        val participantesTextView = findViewById<TextView>(R.id.participantesTextView)
+        val datosTextView = findViewById<TextView>(R.id.telefonoTextView)
         val btnBack = findViewById<Button>(R.id.btnBack)
         mesasRecyclerView = findViewById(R.id.mesasRecyclerView)
 
@@ -40,8 +39,7 @@ class VisualizarEvento2Activity : AppCompatActivity() {
 
         evento?.let {
             headerTitle.text = it.nombre
-            telefonoTextView.text = "Teléfono: ${it.telefono ?: "No especificado"}"
-            participantesTextView.text = "Participantes: ${it.num_participantes?.toString() ?: "No especificado"}"
+            datosTextView.text = "Teléfono: ${it.telefono ?: "No especificado"}"
             setupRecyclerView(it.distribucion)
         }
 

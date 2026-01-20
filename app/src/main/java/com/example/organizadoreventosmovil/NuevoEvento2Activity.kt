@@ -20,6 +20,7 @@ class NuevoEvento2Activity : AppCompatActivity() {
     private var nombreEvento: String? = null
     private var fechaEvento: String? = null
     private var lugarEvento: String? = null
+    private var telefonoEvento: String? = null
     private var numeroMesas = 5 // Valor por defecto
 
     // Variables para modo edición
@@ -34,6 +35,7 @@ class NuevoEvento2Activity : AppCompatActivity() {
         nombreEvento = intent.getStringExtra("NOMBRE_EVENTO")
         fechaEvento = intent.getStringExtra("FECHA_EVENTO")
         lugarEvento = intent.getStringExtra("LUGAR_EVENTO")
+        telefonoEvento = intent.getStringExtra("TELEFONO_EVENTO")
         numeroMesas = intent.getIntExtra("NUMERO_MESAS", 5)
 
         // Recibir datos de modo edición
@@ -88,6 +90,7 @@ class NuevoEvento2Activity : AppCompatActivity() {
             intent.putExtra("NOMBRE_EVENTO", nombreEvento)
             intent.putExtra("FECHA_EVENTO", fechaEvento)
             intent.putExtra("LUGAR_EVENTO", lugarEvento)
+            intent.putExtra("TELEFONO_EVENTO", telefonoEvento)
             intent.putExtra("NUMERO_MESAS", numeroMesas)
             intent.putParcelableArrayListExtra("LISTA_PARTICIPANTES", ArrayList(participantes))
 

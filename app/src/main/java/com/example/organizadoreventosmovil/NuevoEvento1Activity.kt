@@ -21,7 +21,7 @@ class NuevoEvento1Activity : AppCompatActivity() {
 
     private lateinit var nombreEventoEditText: TextInputEditText
     private lateinit var fechaEditText: TextInputEditText
-    private lateinit var organizadorEditText: TextInputEditText
+    private lateinit var ubicacionEditText: TextInputEditText
     private lateinit var telefonoEditText: TextInputEditText
     private lateinit var participantesEditText: TextInputEditText
     private lateinit var mesasEditText: TextInputEditText
@@ -32,7 +32,7 @@ class NuevoEvento1Activity : AppCompatActivity() {
 
         nombreEventoEditText = findViewById(R.id.nombreEventoEditText)
         fechaEditText = findViewById(R.id.fechaEditText)
-        organizadorEditText = findViewById(R.id.organizadorEditText)
+        ubicacionEditText = findViewById(R.id.ubicacionEditText)
         telefonoEditText = findViewById(R.id.telefonoEditText)
         participantesEditText = findViewById(R.id.participantesEditText)
         mesasEditText = findViewById(R.id.mesasEditText)
@@ -61,7 +61,7 @@ class NuevoEvento1Activity : AppCompatActivity() {
 
         btnContinue.setOnClickListener {
             val nombre = nombreEventoEditText.text.toString().trim()
-            val organizador = organizadorEditText.text.toString().trim()
+            val organizador = ubicacionEditText.text.toString().trim()
             val telefono = telefonoEditText.text.toString().trim()
             val participantesStr = participantesEditText.text.toString().trim()
             val mesasStr = mesasEditText.text.toString().trim()
@@ -109,7 +109,7 @@ class NuevoEvento1Activity : AppCompatActivity() {
 
     private fun cargarDatosDelEvento(evento: Evento) {
         nombreEventoEditText.setText(evento.nombre)
-        organizadorEditText.setText(evento.ubicacion ?: "")
+        ubicacionEditText.setText(evento.ubicacion ?: "")
         telefonoEditText.setText(evento.telefono ?: "")
         participantesEditText.setText(evento.num_participantes?.toString() ?: "")
 

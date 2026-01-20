@@ -20,7 +20,7 @@ class EventoAdapter(private val eventos: List<Evento>, private val onItemClick: 
         val evento = eventos[position]
         holder.nombreEvento.text = evento.nombre
         holder.fechaEvento.text = "Fecha: ${evento.fecha ?: ""}"
-        holder.lugarEvento.text = "Nombre del Organizador: ${evento.ubicacion ?: ""}"
+        holder.lugarEvento.text = "Ubicación: ${evento.ubicacion ?: ""}"
 
         holder.itemView.setOnClickListener {
             onItemClick(evento)

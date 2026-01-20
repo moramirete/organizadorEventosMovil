@@ -36,7 +36,7 @@
             android:id="@+id/lugarEventoTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre del Organizador"
+            android:text="Ubicacion"
             android:textColor="#5F6368"
             android:textSize="16sp" />
 

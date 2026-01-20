@@ -17,6 +17,7 @@ import com.example.organizadoreventosmovil.Constructores.Participante
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class AsignacionParticipantesActivity : AppCompatActivity() {
 
@@ -28,6 +29,7 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
     private var nombreEvento: String = ""
     private var fechaEvento: String = ""
     private var lugarEvento: String = ""
+    private var telefonoEvento: String? = null
 
     // Para modo edición
     private var isEditMode = false
@@ -41,14 +43,31 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
         nombreEvento = intent.getStringExtra("NOMBRE_EVENTO") ?: ""
         fechaEvento = intent.getStringExtra("FECHA_EVENTO") ?: ""
         lugarEvento = intent.getStringExtra("LUGAR_EVENTO") ?: ""
+        telefonoEvento = intent.getStringExtra("TELEFONO_EVENTO")
         todosParticipantes = intent.getParcelableArrayListExtra("LISTA_PARTICIPANTES") ?: ArrayList()
         val numMesas = intent.getIntExtra("NUMERO_MESAS", 5)
 
         // Recoger datos de modo edición
         isEditMode = intent.getBooleanExtra("IS_EDIT_MODE", false)
         eventoId = intent.getStringExtra("EVENTO_ID")
+        val eventoJson = intent.getStringExtra("EVENTO_JSON")
 
-        inicializarMesas(numMesas)
+        if (isEditMode && eventoJson != null) {
+            try {
+                val eventoOriginal = Json.decodeFromString<Evento>(eventoJson)
+                mesas.clear()
+                mesas.addAll(eventoOriginal.distribucion)
+                // Si el usuario cambió el número de mesas en la pantalla 1, ajustamos
+                if (mesas.size != numMesas) {
+                    ajustarCantidadDeMesas(numMesas)
+                }
+            } catch (e: Exception) {
+                Log.e("EDIT_MODE", "Error al decodificar distribución original: ${e.message}")
+                inicializarMesas(numMesas)
+            }
+        } else {
+            inicializarMesas(numMesas)
+        }
 
         rvMesas = findViewById(R.id.rvMesas)
         findViewById<Button>(R.id.btnQuitarTodos).setOnClickListener {
@@ -72,6 +91,20 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
         actualizarAdapter()
     }
 
+    private fun ajustarCantidadDeMesas(nuevaCantidad: Int) {
+        if (mesas.size < nuevaCantidad) {
+            // Añadir mesas nuevas
+            for (i in (mesas.size + 1)..nuevaCantidad) {
+                mesas.add(Mesa(numero = i))
+            }
+        } else if (mesas.size > nuevaCantidad) {
+            // Quitar mesas sobrantes
+            while (mesas.size > nuevaCantidad) {
+                mesas.removeAt(mesas.size - 1)
+            }
+        }
+    }
+
     private fun asignarAutomaticamente() {
         mesas.forEach { it.participantes.clear() }
         val participantesMezclados = todosParticipantes.shuffled()
@@ -93,10 +126,12 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
         }
 
         val eventoParaGuardar = Evento(
+            id = eventoId,
             usuario_id = user.id,
             nombre = nombreEvento,
             fecha = fechaEvento,
             ubicacion = lugarEvento,
+            telefono = telefonoEvento?.toIntOrNull(),
             distribucion = mesas
         )
 
