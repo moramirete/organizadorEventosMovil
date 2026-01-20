@@ -7,9 +7,7 @@
     android:background="#F2F4F7"
     tools:context=".VisualizarEvento2Activity">
 
-    <!-- 1. CABECERA MODIFICADA -->
-
-    <!-- 2. SCROLLVIEW REEMPLAZADO POR RECYCLERVIEW -->
+    <!-- 1. CABECERA MODIFICADA (TELÉFONO ELIMINADO) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
@@ -18,8 +16,7 @@
         android:paddingHorizontal="16dp"
         android:paddingTop="50dp"
         android:paddingBottom="24dp"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,31 +41,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="Selecciona una mesa"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/telefonoTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/participantesTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
+                android:text="Pulsa en una mesa para ver los invitados"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- 2. RECYCLERVIEW DE MESAS -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mesasRecyclerView"
         android:layout_width="match_parent"

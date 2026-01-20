@@ -10,7 +10,7 @@ data class Evento(
     val descripcion: String? = null,
     val fecha: String? = null,
     val ubicacion: String? = null,
-    val telefono: String? = null,
+    val telefono: Long? = null, // Cambiado de String? a Long?
     val num_participantes: Int? = null,
     val distribucion: List<Mesa> = emptyList()
 )

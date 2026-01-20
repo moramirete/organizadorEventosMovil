@@ -3,6 +3,7 @@ package com.example.organizadoreventosmovil
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +24,6 @@ class VisualizarEvento2Activity : AppCompatActivity() {
         setContentView(R.layout.activity_visualizar_evento2)
 
         val headerTitle = findViewById<TextView>(R.id.headerTitle)
-        val datosTextView = findViewById<TextView>(R.id.telefonoTextView)
         val btnBack = findViewById<Button>(R.id.btnBack)
         mesasRecyclerView = findViewById(R.id.mesasRecyclerView)
 
@@ -39,10 +39,8 @@ class VisualizarEvento2Activity : AppCompatActivity() {
 
         evento?.let {
             headerTitle.text = it.nombre
-            datosTextView.text = "Teléfono: ${it.telefono ?: "No especificado"}"
             setupRecyclerView(it.distribucion)
         }
-
 
         btnBack.setOnClickListener {
             finish()
@@ -50,8 +48,24 @@ class VisualizarEvento2Activity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(mesas: List<Mesa>) {
-        mesaAdapter = MesaAdapter(mesas.toMutableList()) { /* No hacer nada al hacer clic */ }
+        mesaAdapter = MesaAdapter(mesas.toMutableList()) { mesa ->
+            mostrarDialogoParticipantes(mesa)
+        }
         mesasRecyclerView.layoutManager = GridLayoutManager(this, 2)
         mesasRecyclerView.adapter = mesaAdapter
+    }
+
+    private fun mostrarDialogoParticipantes(mesa: Mesa) {
+        val nombres = if (mesa.participantes.isEmpty()) {
+            "No hay invitados asignados a esta mesa."
+        } else {
+            mesa.participantes.joinToString("\n") { "• ${it.nombre}" }
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Invitados - Mesa ${mesa.numero}")
+            .setMessage(nombres)
+            .setPositiveButton("Cerrar", null)
+            .show()
     }
 }

@@ -44,8 +44,12 @@ class NuevoEvento1Activity : AppCompatActivity() {
         if (isEditMode) {
             val eventoJson = intent.getStringExtra("EVENTO_JSON")
             if (eventoJson != null) {
-                evento = Json.decodeFromString<Evento>(eventoJson)
-                cargarDatosDelEvento(evento!!)
+                try {
+                    evento = Json.decodeFromString<Evento>(eventoJson)
+                    cargarDatosDelEvento(evento!!)
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -88,8 +92,6 @@ class NuevoEvento1Activity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Toast.makeText(this, "✅ Datos básicos correctos", Toast.LENGTH_SHORT).show()
-
             val intent = Intent(this, NuevoEvento2Activity::class.java)
             intent.putExtra("NOMBRE_EVENTO", nombre)
             intent.putExtra("FECHA_EVENTO", if (fechaIsoParaNube.isNotEmpty()) fechaIsoParaNube else evento?.fecha)
@@ -97,10 +99,15 @@ class NuevoEvento1Activity : AppCompatActivity() {
             intent.putExtra("TELEFONO_EVENTO", telefono)
             intent.putExtra("NUM_PARTICIPANTES", numParticipantes)
             intent.putExtra("NUMERO_MESAS", numMesas)
-             if (isEditMode) {
+            
+            if (isEditMode) {
                 intent.putExtra("EVENTO_ID", evento?.id)
                 intent.putExtra("IS_EDIT_MODE", true)
+                // Pasamos los participantes actuales para que no se pierdan
+                val listaActual = evento?.distribucion?.flatMap { it.participantes } ?: emptyList()
+                intent.putParcelableArrayListExtra("LISTA_PARTICIPANTES", ArrayList(listaActual))
             }
+            
             startActivity(intent)
         }
 
@@ -110,25 +117,30 @@ class NuevoEvento1Activity : AppCompatActivity() {
     private fun cargarDatosDelEvento(evento: Evento) {
         nombreEventoEditText.setText(evento.nombre)
         ubicacionEditText.setText(evento.ubicacion ?: "")
-        telefonoEditText.setText(evento.telefono ?: "")
-        participantesEditText.setText(evento.num_participantes?.toString() ?: "")
+        telefonoEditText.setText(evento.telefono?.toString() ?: "")
+        
+        // LÓGICA DE RECUPERACIÓN DE PARTICIPANTES:
+        // Si num_participantes es null o 0, sumamos los que hay en las mesas
+        val totalParticipantes = if (evento.num_participantes != null && evento.num_participantes > 0) {
+            evento.num_participantes
+        } else {
+            evento.distribucion.sumOf { it.participantes.size }
+        }
+        
+        participantesEditText.setText(totalParticipantes.toString())
+        mesasEditText.setText(evento.distribucion.size.toString())
 
         if (!evento.fecha.isNullOrEmpty()) {
             val dateStr = evento.fecha
-            fechaIsoParaNube = dateStr // Guardamos la fecha original
-
+            fechaIsoParaNube = dateStr
             val parser = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
             try {
                 val parsedDate = parser.parse(dateStr)
                 fechaEditText.setText(parsedDate?.let { formatter.format(it) } ?: dateStr)
             } catch (e: Exception) {
-                fechaEditText.setText(dateStr) // Fallback a mostrar la fecha tal cual
+                fechaEditText.setText(dateStr)
             }
-        } else {
-            fechaEditText.setText("")
         }
-
-        mesasEditText.setText(evento.distribucion.size.toString())
     }
 }

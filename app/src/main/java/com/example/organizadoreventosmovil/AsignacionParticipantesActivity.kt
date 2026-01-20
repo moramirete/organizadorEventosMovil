@@ -30,6 +30,7 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
     private var fechaEvento: String = ""
     private var lugarEvento: String = ""
     private var telefonoEvento: String? = null
+    private var numParticipantesTotal = 0
 
     // Para modo edición
     private var isEditMode = false
@@ -46,6 +47,7 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
         telefonoEvento = intent.getStringExtra("TELEFONO_EVENTO")
         todosParticipantes = intent.getParcelableArrayListExtra("LISTA_PARTICIPANTES") ?: ArrayList()
         val numMesas = intent.getIntExtra("NUMERO_MESAS", 5)
+        numParticipantesTotal = intent.getIntExtra("NUM_PARTICIPANTES", 0)
 
         // Recoger datos de modo edición
         isEditMode = intent.getBooleanExtra("IS_EDIT_MODE", false)
@@ -131,7 +133,8 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
             nombre = nombreEvento,
             fecha = fechaEvento,
             ubicacion = lugarEvento,
-            telefono = telefonoEvento?.toIntOrNull(),
+            telefono = telefonoEvento?.toLongOrNull(),
+            num_participantes = numParticipantesTotal, // Guardamos el número de participantes
             distribucion = mesas
         )
 
