@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         val btnAction = findViewById<Button>(R.id.btnAction)
         val groupUsername = findViewById<LinearLayout>(R.id.groupUsername)
         val groupConfirmPassword = findViewById<LinearLayout>(R.id.groupConfirmPassword)
-        
+
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val etConfirmPassword = findViewById<EditText>(R.id.etConfirmPassword)
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                
+
                 if (username.isEmpty()) {
                     Toast.makeText(this, "El nombre de usuario es obligatorio", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
@@ -113,6 +113,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loginUser(identifier: String, password: String) {
+        LoadingUtils.showLoading(this) // MOSTRAR CARGA
         lifecycleScope.launch {
             try {
                 var emailToUse = identifier
@@ -125,10 +126,11 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         .decodeSingleOrNull<UsuarioEmailOnly>()
-                    
+
                     if (resultado != null) {
                         emailToUse = resultado.email
                     } else {
+                        LoadingUtils.hideLoading() // QUITAR CARGA
                         Toast.makeText(this@MainActivity, "Usuario no encontrado", Toast.LENGTH_SHORT).show()
                         return@launch
                     }
@@ -138,10 +140,12 @@ class MainActivity : AppCompatActivity() {
                     this.email = emailToUse
                     this.password = password
                 }
-                
+
+                LoadingUtils.hideLoading() // QUITAR CARGA
                 startActivity(Intent(this@MainActivity, HomeActivity::class.java))
                 finish()
             } catch (e: Exception) {
+                LoadingUtils.hideLoading() // QUITAR CARGA
                 Log.e("SUPABASE_ERROR", "Error de Login: ", e)
                 val msg = if (e.message?.contains("invalid", true) == true) "Credenciales incorrectas" else "Error al iniciar sesión"
                 Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
@@ -150,6 +154,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerUser(email: String, password: String, username: String) {
+        LoadingUtils.showLoading(this) // MOSTRAR CARGA
         lifecycleScope.launch {
             try {
                 SupabaseClient.client.auth.signUpWith(Email) {
@@ -160,10 +165,12 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
+                LoadingUtils.hideLoading() // QUITAR CARGA
                 Toast.makeText(this@MainActivity, "¡Bienvenido! Registro exitoso", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this@MainActivity, HomeActivity::class.java))
                 finish()
             } catch (e: Exception) {
+                LoadingUtils.hideLoading() // QUITAR CARGA
                 Log.e("SUPABASE_ERROR", "Error de Registro: ", e)
                 val msg = if (e.message?.contains("already registered", true) == true) {
                     "Este correo ya está registrado"

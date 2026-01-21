@@ -64,7 +64,8 @@
                 android:id="@+id/etNombreParticipante"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nombre del Participante" />
+                android:hint="Nombre del Participante"
+                android:textColor="@android:color/black" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
@@ -83,7 +84,8 @@
                     android:id="@+id/etPrefiere"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Prefiere a..." />
+                    android:hint="Prefiere a..."
+                    android:textColor="@android:color/black"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -97,20 +99,23 @@
                     android:id="@+id/etNoPrefiere"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="No prefiere a..." />
+                    android:hint="No prefiere a..."
+                    android:textColor="@android:color/black"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnAgregarParticipante"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
             android:layout_marginTop="12dp"
+            android:background="#1E73E8"
             android:text="Agregar Participante"
+            android:textColor="@android:color/white"
             android:textAllCaps="false"
-            android:textSize="16sp"
-            app:cornerRadius="12dp" />
-
+            android:textStyle="bold"
+            android:textSize="18sp" />
 
     </LinearLayout>
 
@@ -131,34 +136,36 @@
         android:id="@+id/footerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"        android:padding="16dp"
+        android:orientation="vertical"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Botón Siguiente con bordes redondeados -->
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSiguiente"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginBottom="12dp"
-            android:text="Siguiente"
-            android:textSize="18sp"
+            android:background="#1E73E8"
+            android:text="Continuar"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
             android:textStyle="bold"
-            app:cornerRadius="12dp" />
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
 
-        <!-- Botón Volver con bordes redondeados (estilo Outlined) -->
-        <com.google.android.material.button.MaterialButton
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnVolver"
-            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Volver"
+            android:background="@drawable/button_white_background"
+            android:text="Volver Atrás"
             android:textColor="#202124"
-            android:textSize="18sp"
+            android:textAllCaps="false"
             android:textStyle="bold"
-            app:cornerRadius="12dp"
-            app:strokeColor="#BDBDBD"/>
+            android:textSize="18sp"
+            />
 
     </LinearLayout>
 

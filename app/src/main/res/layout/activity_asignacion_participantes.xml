@@ -54,23 +54,29 @@
         android:padding="16dp"
         app:layout_constraintTop_toBottomOf="@+id/headerContainer">
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnQuitarTodos"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:backgroundTint="#1E73E8"
+            android:layout_height="56dp"
+            android:background="#1E73E8"
             android:text="Vaciar Mesas"
-            android:textAllCaps="false" />
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnAsignarAuto"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:backgroundTint="#1E73E8"
+            android:layout_height="56dp"
+            android:background="#1E73E8"
             android:text="Asignación Inteligente (Óptima)"
+            android:textColor="@android:color/white"
             android:textAllCaps="false"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -90,21 +96,28 @@
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGuardar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:backgroundTint="#1E73E8"
+            android:layout_height="56dp"
+            android:background="#1E73E8"
             android:text="Guardar Evento"
-            android:textStyle="bold" />
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnVolver"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@drawable/button_white_bordered"
-            android:text="Volver" />
+            android:background="@drawable/button_white_background"
+            android:text="Volver"
+            android:textColor="#202124"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="18sp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

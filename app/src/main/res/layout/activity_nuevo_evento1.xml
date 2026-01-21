@@ -68,8 +68,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Nombre del Evento"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- CAMPO: FECHA -->
@@ -87,8 +86,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Fecha del Evento (dd/mm/aaaa)"
                     android:inputType="date"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- CAMPO: NOMBRE DEL ORGANIZADOR -->
@@ -105,8 +103,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Ubicación del Evento"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- CAMPO: TELÉFONO -->
@@ -124,8 +121,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Teléfono de Contacto"
                     android:inputType="phone"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- CAMPO: NÚMERO DE PARTICIPANTES -->
@@ -143,8 +139,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Número de participantes"
                     android:inputType="number"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- CAMPO: NÚMERO DE MESAS -->
@@ -161,8 +156,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Número de mesas"
                     android:inputType="number"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>

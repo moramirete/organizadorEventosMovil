@@ -31,7 +31,6 @@ class ModificarEvento1Activity : AppCompatActivity() {
         eventosRecyclerView = findViewById(R.id.eventosRecyclerView)
         val btnVolver = findViewById<Button>(R.id.btnVolver)
 
-        // Configuración del Adaptador con lógica de Nube
         adapter = EventoModificarAdapter(
             eventos,
             onEditClick = { evento ->
@@ -63,9 +62,9 @@ class ModificarEvento1Activity : AppCompatActivity() {
         val user = SupabaseClient.client.auth.currentUserOrNull()
         if (user == null) return
 
+        LoadingUtils.showLoading(this) // Pantalla de carga al empezar
         lifecycleScope.launch {
             try {
-                // Consultamos solo los eventos que pertenecen al usuario logueado
                 val lista = SupabaseClient.client.postgrest["eventos"]
                     .select(columns = Columns.ALL) {
                         filter {
@@ -80,6 +79,8 @@ class ModificarEvento1Activity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("SUPABASE", "Error al cargar: ${e.message}")
                 Toast.makeText(this@ModificarEvento1Activity, "Error al sincronizar datos", Toast.LENGTH_SHORT).show()
+            } finally {
+                LoadingUtils.hideLoading() // Quitar carga siempre al terminar
             }
         }
     }
@@ -87,9 +88,9 @@ class ModificarEvento1Activity : AppCompatActivity() {
     private fun eliminarEventoDeNube(evento: Evento) {
         val idEvento = evento.id ?: return
 
+        LoadingUtils.showLoading(this) // Pantalla de carga al eliminar
         lifecycleScope.launch {
             try {
-                // Eliminamos de la tabla "eventos" donde coincida el ID
                 SupabaseClient.client.postgrest["eventos"].delete {
                     filter {
                         eq("id", idEvento)
@@ -98,7 +99,6 @@ class ModificarEvento1Activity : AppCompatActivity() {
 
                 Toast.makeText(this@ModificarEvento1Activity, "Evento '${evento.nombre}' eliminado", Toast.LENGTH_SHORT).show()
 
-                // Refrescamos la lista localmente para no tener que volver a descargar todo
                 val posicion = eventos.indexOf(evento)
                 if (posicion != -1) {
                     eventos.removeAt(posicion)
@@ -107,6 +107,8 @@ class ModificarEvento1Activity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("SUPABASE", "Error al eliminar: ${e.message}")
                 Toast.makeText(this@ModificarEvento1Activity, "No se pudo eliminar el evento", Toast.LENGTH_SHORT).show()
+            } finally {
+                LoadingUtils.hideLoading() // Quitar carga
             }
         }
     }
