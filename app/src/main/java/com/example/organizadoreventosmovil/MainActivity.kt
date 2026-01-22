@@ -154,32 +154,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerUser(email: String, password: String, username: String) {
-        LoadingUtils.showLoading(this) // MOSTRAR CARGA
+        LoadingUtils.showLoading(this)
         lifecycleScope.launch {
             try {
+                // Asegúrate de enviar los datos en el campo 'data'
                 SupabaseClient.client.auth.signUpWith(Email) {
                     this.email = email
                     this.password = password
+                    // Estos son los metadatos que el Trigger leerá
                     data = buildJsonObject {
                         put("username", username)
                     }
                 }
 
-                LoadingUtils.hideLoading() // QUITAR CARGA
+                LoadingUtils.hideLoading()
                 Toast.makeText(this@MainActivity, "¡Bienvenido! Registro exitoso", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this@MainActivity, HomeActivity::class.java))
                 finish()
             } catch (e: Exception) {
-                LoadingUtils.hideLoading() // QUITAR CARGA
-                Log.e("SUPABASE_ERROR", "Error de Registro: ", e)
-                val msg = if (e.message?.contains("already registered", true) == true) {
-                    "Este correo ya está registrado"
-                } else if (e.message?.contains("duplicate", true) == true) {
-                    "El nombre de usuario ya existe"
-                } else {
-                    "No se pudo completar el registro"
-                }
-                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
+                LoadingUtils.hideLoading()
+                Log.e("SUPABASE_ERROR", "Error de Registro: ${e.message}")
+                // ... resto de tu manejo de errores
             }
         }
     }
