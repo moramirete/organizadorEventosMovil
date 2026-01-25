@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -191,14 +192,117 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
     }
 
     private fun actualizarUI() {
-        adapter = MesaAdapter(mesas) { mostrarDialogoSeleccionParticipante(it) }
+        adapter = MesaAdapter(mesas) { mostrarDialogoDetalleMesa(it) }
         rvMesas.adapter = adapter
         val conflictos = obtenerListaConflictos()
         btnVerConflictos.visibility = if (conflictos.isNotEmpty()) View.VISIBLE else View.GONE
         if (conflictos.isNotEmpty()) btnVerConflictos.iconTint = ColorStateList.valueOf(if (detectarConflictosGraves()) Color.RED else Color.parseColor("#FFA500"))
     }
+    
+    private fun mostrarDialogoDetalleMesa(mesa: Mesa) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_detalle_mesa, null)
+        val tvTitulo = dialogView.findViewById<TextView>(R.id.tvTituloMesa)
+        val etCapacidad = dialogView.findViewById<android.widget.EditText>(R.id.etCapacidad)
+        val rvParticipantes = dialogView.findViewById<RecyclerView>(R.id.rvParticipantesMesa)
+        val btnAgregar = dialogView.findViewById<Button>(R.id.btnAgregarInvitado)
+        val btnCerrar = dialogView.findViewById<Button>(R.id.btnCerrarDialogo)
+
+        tvTitulo.text = "Mesa ${mesa.numero}"
+        etCapacidad.setText(mesa.capacidad.toString())
+
+        val participantesAdapter = com.example.organizadoreventosmovil.Adapters.ParticipanteAdapter(
+            mesa.participantes,
+            onEliminarClick = { participante ->
+                mesa.participantes.remove(participante)
+                actualizarUI()
+                rvParticipantes.adapter?.notifyDataSetChanged()
+            },
+            onEditarClick = null  // No edit mode in table dialog
+        )
+        rvParticipantes.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        rvParticipantes.adapter = participantesAdapter
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        btnAgregar.setOnClickListener {
+            mostrarSelectorParticipantes(mesa) {
+                participantesAdapter.notifyDataSetChanged()
+            }
+        }
+
+        btnCerrar.setOnClickListener {
+            val nuevaCapacidadTexto = etCapacidad.text.toString()
+            val nuevaCapacidad = nuevaCapacidadTexto.toIntOrNull()
+            
+            if (nuevaCapacidad == null || nuevaCapacidad <= 0) {
+                Toast.makeText(this, "La capacidad debe ser un número positivo", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            if (nuevaCapacidad < mesa.participantes.size) {
+                Toast.makeText(this, "La capacidad no puede ser menor que los participantes actuales (${mesa.participantes.size})", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            
+            mesa.capacidad = nuevaCapacidad
+            dialog.dismiss()
+            actualizarUI()
+        }
+
+        dialog.show()
+    }
+
+    private fun mostrarSelectorParticipantes(mesa: Mesa, onParticipanteAgregado: () -> Unit) {
+        val asignados = mesas.flatMap { it.participantes }.toSet()
+        val disponibles = todosParticipantes.filter { !asignados.contains(it) }
+        val nombres = disponibles.map { it.nombre }.toTypedArray()
+
+        if (nombres.isEmpty()) {
+            Toast.makeText(this, "No hay participantes disponibles", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Agregar a Mesa ${mesa.numero}")
+            .setItems(nombres) { _, which ->
+                if (mesa.participantes.size < mesa.capacidad) {
+                    mesa.participantes.add(disponibles[which])
+                    actualizarUI()
+                    onParticipanteAgregado()
+                } else {
+                    Toast.makeText(this, "Mesa llena. Aumente la capacidad primero.", Toast.LENGTH_LONG).show()
+                }
+            }
+            .show()
+    }
 
     private fun guardarEventoEnNube() {
+        // Validar participantes no asignados
+        val asignados = mesas.flatMap { it.participantes }.toSet()
+        val noAsignados = todosParticipantes.filter { !asignados.contains(it) }
+        
+        if (noAsignados.isNotEmpty()) {
+            val nombresNoAsignados = noAsignados.joinToString("\n") { "• ${it.nombre}" }
+            AlertDialog.Builder(this)
+                .setTitle("Participantes sin asignar")
+                .setMessage("Los siguientes participantes no han sido asignados a ninguna mesa:\n\n$nombresNoAsignados\n\n¿Deseas eliminarlos de la lista de invitados y continuar?")
+                .setPositiveButton("Eliminar y guardar") { _, _ ->
+                    // Eliminar no asignados de la lista principal
+                    todosParticipantes.removeAll(noAsignados)
+                    procederConGuardado()
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+            return
+        }
+        
+        procederConGuardado()
+    }
+    
+    private fun procederConGuardado() {
         val user = SupabaseClient.client.auth.currentUserOrNull()
         if (user == null) {
             Toast.makeText(this, "Debe iniciar sesión para guardar", Toast.LENGTH_LONG).show()
@@ -239,18 +343,5 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
                 Toast.makeText(this@AsignacionParticipantesActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
-    }
-
-    private fun mostrarDialogoSeleccionParticipante(mesa: Mesa) {
-        val asignados = mesas.flatMap { it.participantes }.toSet()
-        val disponibles = todosParticipantes.filter { !asignados.contains(it) }
-        val nombres = disponibles.map { it.nombre }.toTypedArray()
-        if (nombres.isEmpty()) return
-        AlertDialog.Builder(this).setTitle("Mesa ${mesa.numero}").setItems(nombres) { _, which ->
-            if (mesa.participantes.size < mesa.capacidad) {
-                mesa.participantes.add(disponibles[which])
-                actualizarUI()
-            } else Toast.makeText(this, "Mesa llena", Toast.LENGTH_SHORT).show()
-        }.show()
     }
 }

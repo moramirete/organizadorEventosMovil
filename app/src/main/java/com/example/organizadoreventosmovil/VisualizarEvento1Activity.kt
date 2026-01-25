@@ -55,6 +55,7 @@ class VisualizarEvento1Activity : AppCompatActivity() {
         val user = SupabaseClient.client.auth.currentUserOrNull()
         if (user == null) return
 
+        LoadingUtils.showLoading(this) // Mostrar loading
         lifecycleScope.launch {
             try {
                 val lista = SupabaseClient.client.postgrest["eventos"]
@@ -71,6 +72,8 @@ class VisualizarEvento1Activity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("SUPABASE", "Error cargando: ${e.message}")
                 Toast.makeText(this@VisualizarEvento1Activity, "Error al sincronizar", Toast.LENGTH_SHORT).show()
+            } finally {
+                LoadingUtils.hideLoading() // Ocultar loading
             }
         }
     }

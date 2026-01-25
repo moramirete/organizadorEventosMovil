@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/tvTituloMesa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mesa 1"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#202124"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Capacidad:"
+            android:textSize="16sp"
+            android:textColor="#5F6368"
+            android:layout_marginEnd="8dp"/>
+
+        <EditText
+            android:id="@+id/etCapacidad"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="10"
+            android:textColor="#202124"
+            android:padding="8dp"
+            android:background="@android:drawable/editbox_background"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Participantes asignados:"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#5F6368"
+        android:layout_marginBottom="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvParticipantesMesa"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnAgregarInvitado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Agregar Invitado"
+        android:backgroundTint="#1E73E8"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/btnCerrarDialogo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cerrar"
+        android:backgroundTint="#808080"
+        android:textColor="@android:color/white"/>
+
+</LinearLayout>

@@ -11,12 +11,14 @@ import com.example.organizadoreventosmovil.R
 
 class ParticipanteAdapter(
     private val participantes: MutableList<Participante>,
-    private val onEliminarClick: (Participante) -> Unit
+    private val onEliminarClick: (Participante) -> Unit,
+    private val onEditarClick: ((Participante) -> Unit)? = null
 ) : RecyclerView.Adapter<ParticipanteAdapter.ParticipanteViewHolder>() {
 
     class ParticipanteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvNombre: TextView = view.findViewById(R.id.tvNombre)
         val tvPreferencias: TextView = view.findViewById(R.id.tvPreferencias)
+        val btnEditar: ImageButton? = view.findViewById(R.id.btnEditar)
         val btnEliminar: ImageButton = view.findViewById(R.id.btnEliminar)
     }
 
@@ -37,6 +39,15 @@ class ParticipanteAdapter(
 
         holder.btnEliminar.setOnClickListener {
             onEliminarClick(participante)
+        }
+        
+        holder.btnEditar?.apply {
+            if (onEditarClick != null) {
+                visibility = View.VISIBLE
+                setOnClickListener { onEditarClick.invoke(participante) }
+            } else {
+                visibility = View.GONE
+            }
         }
     }
 

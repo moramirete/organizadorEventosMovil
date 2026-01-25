@@ -80,12 +80,13 @@
                 android:layout_marginEnd="4dp"
                 app:boxBackgroundColor="@android:color/white">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                     android:id="@+id/etPrefiere"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Prefiere a..."
-                    android:textColor="@android:color/black"/>
+                    android:hint="Prefiere a... (separar con comas)"
+                    android:textColor="@android:color/black"
+                    android:background="@android:color/transparent"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -95,12 +96,13 @@
                 android:layout_marginStart="4dp"
                 app:boxBackgroundColor="@android:color/white">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                     android:id="@+id/etNoPrefiere"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="No prefiere a..."
-                    android:textColor="@android:color/black"/>
+                    android:hint="No prefiere a... (separar con comas)"
+                    android:textColor="@android:color/black"
+                    android:background="@android:color/transparent"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 

@@ -64,6 +64,12 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // Validar longitud de contraseña
+            if (password.length < 6) {
+                Toast.makeText(this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (isLoginMode) {
                 loginUser(identifier, password)
             } else {
@@ -81,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
-                if (!email.contains("@")) {
+                if (!email.contains("@") || !email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))) {
                     Toast.makeText(this, "Por favor introduce un email válido", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }

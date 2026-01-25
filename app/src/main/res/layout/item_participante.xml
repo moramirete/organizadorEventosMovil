@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
+    app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp">
 
@@ -37,6 +38,15 @@
                 android:textSize="12sp"
                 android:textColor="#5F6368" />
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnEditar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="#1E73E8"
+            android:layout_marginEnd="8dp" />
 
         <ImageButton
             android:id="@+id/btnEliminar"
