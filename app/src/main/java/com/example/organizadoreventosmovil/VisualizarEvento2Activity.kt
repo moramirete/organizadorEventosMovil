@@ -62,18 +62,9 @@ class VisualizarEvento2Activity : AppCompatActivity() {
             mesa.participantes.joinToString("\n") { "• ${it.nombre}" }
         }
 
-        // Crear un TextView con fondo blanco para dark mode
-        val textView = TextView(this).apply {
-            text = nombres
-            textSize = 16f
-            setTextColor(android.graphics.Color.parseColor("#202124"))
-            setBackgroundColor(android.graphics.Color.WHITE)
-            setPadding(48, 48, 48, 48)
-        }
-
         AlertDialog.Builder(this)
             .setTitle("Invitados - Mesa ${mesa.numero}")
-            .setView(textView)
+            .setMessage(nombres)
             .setPositiveButton("Cerrar", null)
             .show()
     }
