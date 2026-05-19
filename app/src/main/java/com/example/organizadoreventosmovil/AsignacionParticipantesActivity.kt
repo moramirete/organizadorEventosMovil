@@ -317,6 +317,7 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
             usuario_id = user.id,
             nombre = nombreEvento,
             fecha = fechaEvento,
+            hora = "00:00:00",
             ubicacion = lugarEvento,
             telefono = telefonoEvento?.toLongOrNull(),
             num_participantes = numParticipantesTotal,
