@@ -18,9 +18,19 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+
+@Serializable
+data class NuevoUsuario(    
+    val id: String,
+    val email: String,
+    val username: String,
+    @SerialName("password_hash")
+    val passwordHash: String
+)
 
 @Serializable
 data class UsuarioEmailOnly(val email: String)
@@ -160,28 +170,48 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerUser(email: String, password: String, username: String) {
-        LoadingUtils.showLoading(this)
-        lifecycleScope.launch {
-            try {
-                // Asegúrate de enviar los datos en el campo 'data'
-                SupabaseClient.client.auth.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                    // Estos son los metadatos que el Trigger leerá
-                    data = buildJsonObject {
-                        put("username", username)
-                    }
+    LoadingUtils.showLoading(this)
+    lifecycleScope.launch {
+        try {
+            // 1. Realizar el registro en Auth pasando ambos metadatos para asegurar compatibilidad con Python
+            val response = SupabaseClient.client.auth.signUpWith(Email) {
+                this.email = email
+                this.password = password
+                data = buildJsonObject {
+                    put("username", username)
+                    put("full_name", username) // 👈 CLAVE: Mantiene la compatibilidad con el Desktop en Python
                 }
+            }
 
+            // 2. Obtener el ID del usuario recién creado
+            val userId = response?.id 
+                ?: SupabaseClient.client.auth.currentUserOrNull()?.id
+
+            if (userId != null) {
+                // 3. Insertar en la tabla pública de 'usuarios'
+                val nuevoUsuario = NuevoUsuario(
+                    id = userId,
+                    email = email,
+                    username = username,
+                    passwordHash = ""
+                )
+                
+                SupabaseClient.client.postgrest["usuarios"].insert(nuevoUsuario)
+                
                 LoadingUtils.hideLoading()
                 Toast.makeText(this@MainActivity, "¡Bienvenido! Registro exitoso", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this@MainActivity, HomeActivity::class.java))
                 finish()
-            } catch (e: Exception) {
-                LoadingUtils.hideLoading()
-                Log.e("SUPABASE_ERROR", "Error de Registro: ${e.message}")
-                // ... resto de tu manejo de errores
+            } else {
+                throw Exception("No se pudo obtener el ID del usuario")
             }
+
+        } catch (e: Exception) {
+            LoadingUtils.hideLoading()
+            Log.e("SUPABASE_ERROR", "Error de Registro: ${e.message}")
+            Toast.makeText(this@MainActivity, "Error al registrar: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
+}
+
 }
