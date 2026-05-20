@@ -131,51 +131,148 @@ class AsignacionParticipantesActivity : AppCompatActivity() {
     }
 
     private fun asignarAlgoritmoOptimo() {
+        // Vaciar participantes de las mesas
         mesas.forEach { it.participantes.clear() }
-        val prioritarios = todosParticipantes.sortedByDescending { 
-            (if (it.prefiere.isNotEmpty()) 2 else 0) + (if (it.noPrefiere.isNotEmpty()) 3 else 0)
+
+        // 1. Mapear y normalizar los participantes (a minúsculas y listas de amigos/enemigos)
+        class PersonaAlg(
+            val original: Participante,
+            val nombreCanonico: String,
+            val amigos: List<String>,
+            val enemigos: List<String>
+        )
+
+        val personas = todosParticipantes.map { p ->
+            val amigos = p.prefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+            val enemigos = p.noPrefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+            PersonaAlg(p, p.nombre.trim().lowercase(), amigos, enemigos)
         }
-        for (participante in prioritarios) {
+
+        // 2. Ordenar por peso = amigos.size + enemigos.size (quien tiene más restricciones va primero)
+        val prioritarios = personas.sortedByDescending { it.amigos.size + it.enemigos.size }
+
+        val excluidos = mutableListOf<Participante>()
+
+        // 3. Algoritmo Greedy con Heurística de Satisfacción (Idéntico a Python)
+        for (p in prioritarios) {
             var mejorMesa: Mesa? = null
-            var mejorPuntuacion = -999999
+            var mejorPuntuacion = -1000 // Puntuación inicial igual que en Python
+
             for (mesa in mesas) {
-                if (mesa.participantes.size < mesa.capacidad) {
-                    val score = calcularPuntuacionDeMesa(participante, mesa)
-                    if (score > mejorPuntuacion) {
-                        mejorPuntuacion = score
-                        mejorMesa = mesa
+                // A. Comprobar Hard Constraints
+                // 1. Capacidad
+                if (mesa.participantes.size >= mesa.capacidad) {
+                    continue
+                }
+
+                // 2. Enemistades (HARD) - Si p tiene a alguien de la mesa como enemigo, o alguien en la mesa tiene a p como enemigo
+                var esViable = true
+                for (otro in mesa.participantes) {
+                    val otroCanon = otro.nombre.trim().lowercase()
+                    val otroPersonaAlg = personas.find { it.nombreCanonico == otroCanon }
+                    val pEsEnemigoDeOtro = otroPersonaAlg?.enemigos?.contains(p.nombreCanonico) == true
+                    val otroEsEnemigoDeP = p.enemigos.contains(otroCanon)
+
+                    if (otroEsEnemigoDeP || pEsEnemigoDeOtro) {
+                        esViable = false
+                        break
                     }
                 }
+                if (!esViable) {
+                    continue
+                }
+
+                // B. Calcular Satisfacción (SOFT)
+                var score = 0
+                for (otro in mesa.participantes) {
+                    val otroCanon = otro.nombre.trim().lowercase()
+                    val otroPersonaAlg = personas.find { it.nombreCanonico == otroCanon }
+
+                    // Si p quiere estar con 'otro'
+                    if (p.amigos.contains(otroCanon)) {
+                        score += 10
+                    }
+                    // Si 'otro' quiere estar con p
+                    if (otroPersonaAlg?.amigos?.contains(p.nombreCanonico) == true) {
+                        score += 10
+                    }
+                }
+
+                if (score > mejorPuntuacion) {
+                    mejorPuntuacion = score
+                    mejorMesa = mesa
+                }
             }
-            mejorMesa?.participantes?.add(participante)
+
+            if (mejorMesa != null) {
+                mejorMesa.participantes.add(p.original)
+            } else {
+                excluidos.add(p.original)
+            }
         }
+
         actualizarUI()
-        Toast.makeText(this, "Asignación inteligente completada", Toast.LENGTH_SHORT).show()
+
+        if (excluidos.isNotEmpty()) {
+            val nombresExcluidos = excluidos.joinToString(", ") { it.nombre }
+            Toast.makeText(this, "Asignación inteligente completada. Excluidos: $nombresExcluidos", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "Asignación inteligente completada con éxito", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun calcularPuntuacionDeMesa(p: Participante, mesa: Mesa): Int {
+        val pAmigos = p.prefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+        val pEnemigos = p.noPrefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+
         var score = -(mesa.participantes.size * 5)
         for (otro in mesa.participantes) {
-            if (p.noPrefiere.equals(otro.nombre, true) || otro.noPrefiere.equals(p.nombre, true)) score -= 1000
-            if (p.prefiere.equals(otro.nombre, true) || otro.prefiere.equals(p.nombre, true)) score += 100
+            val otroCanon = otro.nombre.trim().lowercase()
+            val otroAmigos = otro.prefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+            val otroEnemigos = otro.noPrefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+
+            if (pEnemigos.contains(otroCanon) || otroEnemigos.contains(p.nombre.trim().lowercase())) {
+                score -= 1000
+            }
+            if (pAmigos.contains(otroCanon) || otroAmigos.contains(p.nombre.trim().lowercase())) {
+                score += 100
+            }
         }
         return score
     }
 
     private fun detectarConflictosGraves() = mesas.any { mesa ->
-        mesa.participantes.any { p -> mesa.participantes.any { otro -> p.noPrefiere.equals(otro.nombre, true) } }
+        mesa.participantes.any { p ->
+            val enemigos = p.noPrefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+            mesa.participantes.any { otro ->
+                enemigos.contains(otro.nombre.trim().lowercase())
+            }
+        }
     }
 
     private fun obtenerListaConflictos(): List<String> {
         val lista = mutableListOf<String>()
         for (mesa in mesas) {
             for (p in mesa.participantes) {
-                mesa.participantes.find { it.nombre.equals(p.noPrefiere, true) }?.let {
-                    lista.add("❌ Mesa ${mesa.numero}: ${p.nombre} y ${it.nombre} se llevan mal.")
+                // Parseamos los enemigos de p
+                val enemigos = p.noPrefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+                for (enemigoNombre in enemigos) {
+                    val enemigoEnMesa = mesa.participantes.find { it.nombre.trim().lowercase() == enemigoNombre }
+                    if (enemigoEnMesa != null) {
+                        lista.add("❌ Mesa ${mesa.numero}: ${p.nombre} y ${enemigoEnMesa.nombre} se llevan mal.")
+                    }
                 }
-                if (p.prefiere.isNotEmpty()) {
-                    if (!mesa.participantes.any { it.nombre.equals(p.prefiere, true) } && todosParticipantes.any { it.nombre.equals(p.prefiere, true) }) {
-                        lista.add("⚠️ ${p.nombre} no está sentado con ${p.prefiere}.")
+
+                // Parseamos las preferencias (amigos) de p
+                val amigos = p.prefiere.split(",").map { it.trim().lowercase() }.filter { it.isNotEmpty() }
+                for (amigoNombre in amigos) {
+                    // Si el amigo existe en la lista de todos los participantes del evento, pero no está en esta mesa
+                    val existeAmigoEnEvento = todosParticipantes.any { it.nombre.trim().lowercase() == amigoNombre }
+                    val estaAmigoEnMesa = mesa.participantes.any { it.nombre.trim().lowercase() == amigoNombre }
+                    if (existeAmigoEnEvento && !estaAmigoEnMesa) {
+                        // Buscamos el nombre original del amigo para que quede bonito en el mensaje
+                        val amigoOriginal = todosParticipantes.find { it.nombre.trim().lowercase() == amigoNombre }?.nombre ?: amigoNombre
+                        lista.add("⚠️ ${p.nombre} no está sentado con $amigoOriginal.")
                     }
                 }
             }
