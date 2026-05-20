@@ -74,35 +74,45 @@
             android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPrefiere"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="4dp"
+                app:endIconMode="custom"
+                app:endIconDrawable="@android:drawable/ic_input_add"
                 app:boxBackgroundColor="@android:color/white">
 
-                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPrefiere"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Prefiere a... (separar con comas)"
-                    android:textColor="@android:color/black"
-                    android:background="@android:color/transparent"/>
+                    android:hint="Prefiere a..."
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:cursorVisible="false"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNoPrefiere"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
+                app:endIconMode="custom"
+                app:endIconDrawable="@android:drawable/ic_input_add"
                 app:boxBackgroundColor="@android:color/white">
 
-                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etNoPrefiere"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="No prefiere a... (separar con comas)"
-                    android:textColor="@android:color/black"
-                    android:background="@android:color/transparent"/>
+                    android:hint="No prefiere a..."
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:cursorVisible="false"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 

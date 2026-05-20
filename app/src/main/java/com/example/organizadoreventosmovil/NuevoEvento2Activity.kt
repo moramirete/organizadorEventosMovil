@@ -2,18 +2,17 @@ package com.example.organizadoreventosmovil
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.organizadoreventosmovil.Adapters.ParticipanteAdapter
 import com.example.organizadoreventosmovil.Constructores.Participante
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class NuevoEvento2Activity : AppCompatActivity() {
 
@@ -22,8 +21,8 @@ class NuevoEvento2Activity : AppCompatActivity() {
     private lateinit var tvCounter: TextView
     
     private lateinit var etNombre: TextInputEditText
-    private lateinit var etPrefiere: AppCompatAutoCompleteTextView
-    private lateinit var etNoPrefiere: AppCompatAutoCompleteTextView
+    private lateinit var etPrefiere: TextInputEditText
+    private lateinit var etNoPrefiere: TextInputEditText
     private lateinit var btnAgregar: Button
 
     private var nombreEvento: String? = null
@@ -58,6 +57,10 @@ class NuevoEvento2Activity : AppCompatActivity() {
         etPrefiere = findViewById(R.id.etPrefiere)
         etNoPrefiere = findViewById(R.id.etNoPrefiere)
         btnAgregar = findViewById(R.id.btnAgregarParticipante)
+        
+        val tilPrefiere = findViewById<TextInputLayout>(R.id.tilPrefiere)
+        val tilNoPrefiere = findViewById<TextInputLayout>(R.id.tilNoPrefiere)
+        
         val rvParticipantes = findViewById<RecyclerView>(R.id.rvParticipantes)
         val btnVolver = findViewById<Button>(R.id.btnVolver)
         val btnSiguiente = findViewById<Button>(R.id.btnSiguiente)
@@ -70,7 +73,6 @@ class NuevoEvento2Activity : AppCompatActivity() {
         }
 
         actualizarContador()
-        actualizarSugerencias()
 
         adapter = ParticipanteAdapter(
             participantes,
@@ -78,7 +80,6 @@ class NuevoEvento2Activity : AppCompatActivity() {
                 participantes.remove(participante)
                 adapter.notifyDataSetChanged()
                 actualizarContador()
-                actualizarSugerencias()
                 
                 // Si estaba editando este participante, cancelar edición
                 if (participanteEnEdicion == participante) {
@@ -91,6 +92,13 @@ class NuevoEvento2Activity : AppCompatActivity() {
         )
         rvParticipantes.layoutManager = LinearLayoutManager(this)
         rvParticipantes.adapter = adapter
+
+        // Configurar selectores
+        etPrefiere.setOnClickListener { mostrarSelectorParticipantes(etPrefiere) }
+        etNoPrefiere.setOnClickListener { mostrarSelectorParticipantes(etNoPrefiere) }
+        
+        tilPrefiere.setEndIconOnClickListener { mostrarSelectorParticipantes(etPrefiere) }
+        tilNoPrefiere.setEndIconOnClickListener { mostrarSelectorParticipantes(etNoPrefiere) }
 
         btnAgregar.setOnClickListener {
             if (participanteEnEdicion != null) {
@@ -116,6 +124,69 @@ class NuevoEvento2Activity : AppCompatActivity() {
         }
     }
 
+    private fun mostrarSelectorParticipantes(targetEditText: TextInputEditText) {
+        val nombreActual = etNombre.text.toString().trim()
+        
+        // REQUISITO: No dejar seleccionar si el nombre está vacío
+        if (nombreActual.isEmpty()) {
+            Toast.makeText(this, "Escribe primero el nombre del invitado para poder seleccionar sus preferencias", Toast.LENGTH_LONG).show()
+            etNombre.requestFocus()
+            return
+        }
+
+        if (participantes.isEmpty()) {
+            Toast.makeText(this, "Añade primero a otros participantes a la lista", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Obtener nombres ya seleccionados en el OTRO campo para excluirlos
+        val nombresEnOtroCampo = if (targetEditText == etPrefiere) {
+            etNoPrefiere.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        } else {
+            etPrefiere.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        }
+
+        // Filtramos: 
+        // 1. No puede seleccionarse a sí mismo
+        // 2. No puede estar en la lista opuesta (si prefiere a Juan, no puede "no preferir" a Juan)
+        val nombresDisponibles = participantes
+            .filter { it.nombre != nombreActual && !nombresEnOtroCampo.contains(it.nombre) }
+            .map { it.nombre }
+            .toTypedArray()
+
+        if (nombresDisponibles.isEmpty()) {
+            Toast.makeText(this, "No hay otros participantes disponibles para esta selección", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val seleccionadosPreviamente = targetEditText.text.toString()
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+
+        val checkedItems = BooleanArray(nombresDisponibles.size) { i ->
+            seleccionadosPreviamente.contains(nombresDisponibles[i])
+        }
+
+        val seleccionadosActuales = seleccionadosPreviamente.toMutableList()
+
+        AlertDialog.Builder(this)
+            .setTitle("Seleccionar Participantes")
+            .setMultiChoiceItems(nombresDisponibles, checkedItems) { _, which, isChecked ->
+                val nombre = nombresDisponibles[which]
+                if (isChecked) {
+                    if (!seleccionadosActuales.contains(nombre)) seleccionadosActuales.add(nombre)
+                } else {
+                    seleccionadosActuales.remove(nombre)
+                }
+            }
+            .setPositiveButton("Aceptar") { _, _ ->
+                targetEditText.setText(seleccionadosActuales.joinToString(", "))
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
     private fun agregarParticipante() {
         if (participantes.size >= numParticipantesTotal) {
             Toast.makeText(this, "Ya has completado la lista de invitados ($numParticipantesTotal)", Toast.LENGTH_LONG).show()
@@ -131,35 +202,15 @@ class NuevoEvento2Activity : AppCompatActivity() {
             return
         }
 
-        // Validar que el nombre no exista ya
         if (participantes.any { it.nombre.equals(nombre, ignoreCase = true) }) {
             Toast.makeText(this, "Ya existe un participante con ese nombre", Toast.LENGTH_SHORT).show()
             return
-        }
-
-        // Validar preferencias (deben existir en la lista)
-        val prefiereNombres = prefiere.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        val noPrefiereNombres = noPrefiere.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        
-        for (nombrePref in prefiereNombres) {
-            if (!participantes.any { it.nombre.equals(nombrePref, ignoreCase = true) }) {
-                Toast.makeText(this, "El participante '$nombrePref' no existe. Añádelo primero.", Toast.LENGTH_LONG).show()
-                return
-            }
-        }
-        
-        for (nombreNoPref in noPrefiereNombres) {
-            if (!participantes.any { it.nombre.equals(nombreNoPref, ignoreCase = true) }) {
-                Toast.makeText(this, "El participante '$nombreNoPref' no existe. Añádelo primero.", Toast.LENGTH_LONG).show()
-                return
-            }
         }
 
         val nuevoParticipante = Participante(nombre, prefiere, noPrefiere)
         participantes.add(nuevoParticipante)
         adapter.notifyDataSetChanged()
         actualizarContador()
-        actualizarSugerencias()
 
         etNombre.text?.clear()
         etPrefiere.text?.clear()
@@ -188,36 +239,15 @@ class NuevoEvento2Activity : AppCompatActivity() {
             return
         }
 
-        // Validar que el nombre no exista (excepto si es el mismo)
         if (participantes.any { it !== participante && it.nombre.equals(nombre, ignoreCase = true) }) {
             Toast.makeText(this, "Ya existe un participante con ese nombre", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Validar preferencias
-        val prefiereNombres = prefiere.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        val noPrefiereNombres = noPrefiere.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        
-        for (nombrePref in prefiereNombres) {
-            if (!participantes.any { it.nombre.equals(nombrePref, ignoreCase = true) }) {
-                Toast.makeText(this, "El participante '$nombrePref' no existe. Añádelo primero.", Toast.LENGTH_LONG).show()
-                return
-            }
-        }
-        
-        for (nombreNoPref in noPrefiereNombres) {
-            if (!participantes.any { it.nombre.equals(nombreNoPref, ignoreCase = true) }) {
-                Toast.makeText(this, "El participante '$nombreNoPref' no existe. Añádelo primero.", Toast.LENGTH_LONG).show()
-                return
-            }
-        }
-
-        // Actualizar el participante
         val index = participantes.indexOf(participante)
         if (index != -1) {
             participantes[index] = Participante(nombre, prefiere, noPrefiere)
             adapter.notifyDataSetChanged()
-            actualizarSugerencias()
         }
 
         cancelarEdicion()
@@ -234,13 +264,6 @@ class NuevoEvento2Activity : AppCompatActivity() {
 
     private fun actualizarContador() {
         tvCounter.text = "Invitados: ${participantes.size} / $numParticipantesTotal"
-    }
-    
-    private fun actualizarSugerencias() {
-        val nombres = participantes.map { it.nombre }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, nombres)
-        etPrefiere.setAdapter(adapter)
-        etNoPrefiere.setAdapter(adapter)
     }
 
     private fun avanzar() {
